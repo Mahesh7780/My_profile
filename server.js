@@ -5,6 +5,7 @@ const path = require('path');
 const helmet = require('helmet');
 const cors = require('cors');
 const multer = require('multer');
+const mongoose = require('mongoose');
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -26,15 +27,38 @@ const MESSAGES_FILE = path.join(__dirname, 'data', 'messages.json');
 // Root password configuration from environment
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'cybersecurity';
 const AUTH_TOKEN = process.env.AUTH_TOKEN || 'admin-session-secure-token';
+const MONGO_URI = process.env.MONGO_URI;
+
+if (MONGO_URI) {
+  mongoose.connect(MONGO_URI)
+    .then(() => console.log('✅ MongoDB Connected'))
+    .catch(err => console.log('❌ MongoDB Error:', err));
+}
+
+// Schemas
+const MessageSchema = new mongoose.Schema({
+  id: String, name: String, email: String, inquiry: String, message: String, company: String, timestamp: String, status: String
+});
+const Message = mongoose.models.Message || mongoose.model('Message', MessageSchema);
+
+const ChangeSchema = new mongoose.Schema({
+  id: String, type: String, section: String, description: String, content: mongoose.Schema.Types.Mixed, oldContent: mongoose.Schema.Types.Mixed, elementId: String, status: String, timestamp: String, approvedAt: String, rejectedAt: String
+});
+const Change = mongoose.models.Change || mongoose.model('Change', ChangeSchema);
+
+const PortfolioSchema = new mongoose.Schema({
+  key: { type: String, default: 'main' },
+  data: mongoose.Schema.Types.Mixed
+});
+const Portfolio = mongoose.models.Portfolio || mongoose.model('Portfolio', PortfolioSchema);
 
 app.use(helmet({
-  contentSecurityPolicy: false, // Disabled to prevent breaking existing frontend assets
+  contentSecurityPolicy: false, 
 }));
 app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
 
-// Helper functions for reading/writing files
 const readJsonFile = (filePath, defaultVal = []) => {
   try {
     if (!fs.existsSync(filePath)) {
@@ -59,7 +83,6 @@ const writeJsonFile = (filePath, data) => {
   }
 };
 
-// Auth middleware
 const requireAuth = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   if (authHeader && authHeader === `Bearer ${AUTH_TOKEN}`) {
@@ -69,211 +92,218 @@ const requireAuth = (req, res, next) => {
   }
 };
 
-// Public Endpoint: Fetch portfolio data
-app.get('/api/portfolio', (req, res) => {
-  const data = readJsonFile(PORTFOLIO_FILE, {});
+// Data Helpers
+async function getPortfolioData() {
+  if (MONGO_URI) {
+    const port = await Portfolio.findOne({ key: 'main' });
+    return port ? port.data : readJsonFile(PORTFOLIO_FILE, {});
+  }
+  return readJsonFile(PORTFOLIO_FILE, {});
+}
+async function savePortfolioData(data) {
+  if (MONGO_URI) {
+    await Portfolio.findOneAndUpdate({ key: 'main' }, { data }, { upsert: true });
+    return true;
+  }
+  return writeJsonFile(PORTFOLIO_FILE, data);
+}
+
+async function getChangesData() {
+  if (MONGO_URI) return await Change.find({});
+  return readJsonFile(CHANGES_FILE, []);
+}
+async function saveChangeData(change) {
+  if (MONGO_URI) {
+    await new Change(change).save();
+    return true;
+  }
+  const changes = readJsonFile(CHANGES_FILE, []);
+  changes.push(change);
+  return writeJsonFile(CHANGES_FILE, changes);
+}
+
+async function getMessagesData() {
+  if (MONGO_URI) return await Message.find({});
+  return readJsonFile(MESSAGES_FILE, []);
+}
+async function saveMessageData(msg) {
+  if (MONGO_URI) {
+    await new Message(msg).save();
+    return true;
+  }
+  const messages = readJsonFile(MESSAGES_FILE, []);
+  messages.push(msg);
+  return writeJsonFile(MESSAGES_FILE, messages);
+}
+
+// Endpoints
+app.get('/api/portfolio', async (req, res) => {
+  const data = await getPortfolioData();
   res.json(data);
 });
 
-// Public Endpoint: Submit contact form message
-app.post('/api/contact', (req, res) => {
+app.post('/api/contact', async (req, res) => {
   const { name, email, inquiry, message, company } = req.body;
-  if (!name || !email || !message) {
-    return res.status(400).json({ error: 'Missing required fields' });
-  }
+  if (!name || !email || !message) return res.status(400).json({ error: 'Missing required fields' });
 
-  const messages = readJsonFile(MESSAGES_FILE);
   const newMessage = {
     id: Date.now() + '-' + Math.floor(Math.random() * 1000),
-    name,
-    email,
-    inquiry,
-    message,
-    company: company || '',
-    timestamp: new Date().toISOString(),
-    status: 'unread'
+    name, email, inquiry, message, company: company || '',
+    timestamp: new Date().toISOString(), status: 'unread'
   };
 
-  messages.push(newMessage);
-  if (writeJsonFile(MESSAGES_FILE, messages)) {
-    res.json({ success: true, message: 'Message sent successfully' });
-  } else {
-    res.status(500).json({ error: 'Failed to save message' });
-  }
+  const success = await saveMessageData(newMessage);
+  if (success) res.json({ success: true, message: 'Message sent successfully' });
+  else res.status(500).json({ error: 'Failed to save message' });
 });
 
-// Admin Endpoint: Login
 app.post('/api/auth/login', (req, res) => {
   const { password } = req.body;
-  if (password === ADMIN_PASSWORD) {
-    res.json({ success: true, token: AUTH_TOKEN });
-  } else {
-    res.status(401).json({ error: 'Invalid password' });
-  }
+  if (password === ADMIN_PASSWORD) res.json({ success: true, token: AUTH_TOKEN });
+  else res.status(401).json({ error: 'Invalid password' });
 });
 
-// Admin Endpoint: Upload Resume (Requires Auth)
 app.post('/api/admin/resume', requireAuth, upload.single('resume'), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: 'No file uploaded' });
-  }
+  if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
   res.json({ success: true, message: 'Resume uploaded successfully', path: '/assets/resume.pdf' });
 });
 
-// Admin Endpoint: Propose content modification (Requires Auth)
-app.post('/api/portfolio/propose', requireAuth, (req, res) => {
+app.post('/api/portfolio/propose', requireAuth, async (req, res) => {
   const { type, section, description, content, oldContent, elementId } = req.body;
-  
-  if (!type || !section || !content) {
-    return res.status(400).json({ error: 'Missing required change details' });
-  }
+  if (!type || !section || !content) return res.status(400).json({ error: 'Missing required change details' });
 
-  const changes = readJsonFile(CHANGES_FILE);
   const newChange = {
     id: 'chg-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
-    type,
-    section,
-    description: description || `Update ${section}`,
-    content,
-    oldContent: oldContent || null,
-    elementId: elementId || null,
-    status: 'pending',
-    timestamp: new Date().toISOString()
+    type, section, description: description || `Update ${section}`,
+    content, oldContent: oldContent || null, elementId: elementId || null,
+    status: 'pending', timestamp: new Date().toISOString()
   };
 
-  changes.push(newChange);
-  if (writeJsonFile(CHANGES_FILE, changes)) {
-    res.json({ success: true, change: newChange });
-  } else {
-    res.status(500).json({ error: 'Failed to record change proposal' });
-  }
+  const success = await saveChangeData(newChange);
+  if (success) res.json({ success: true, change: newChange });
+  else res.status(500).json({ error: 'Failed to record change proposal' });
 });
 
-// Admin Endpoint: Get all changes (Requires Auth)
-app.get('/api/portfolio/changes', requireAuth, (req, res) => {
-  const changes = readJsonFile(CHANGES_FILE);
+app.get('/api/portfolio/changes', requireAuth, async (req, res) => {
+  const changes = await getChangesData();
   res.json(changes);
 });
 
-// Admin Endpoint: Approve a change proposal (Requires Auth)
-app.post('/api/portfolio/changes/:id/approve', requireAuth, (req, res) => {
+app.post('/api/portfolio/changes/:id/approve', requireAuth, async (req, res) => {
   const changeId = req.params.id;
-  const changes = readJsonFile(CHANGES_FILE);
-  const changeIdx = changes.findIndex(c => c.id === changeId);
-
-  if (changeIdx === -1) {
-    return res.status(404).json({ error: 'Change proposal not found' });
-  }
-
-  const change = changes[changeIdx];
-  if (change.status !== 'pending') {
-    return res.status(400).json({ error: `Change already ${change.status}` });
-  }
-
-  // Load portfolio database
-  const portfolio = readJsonFile(PORTFOLIO_FILE, {});
-
-  // Apply change to portfolio object
-  // Section can be 'about', 'skills', 'projects', 'certifications', 'hero', 'experience'
-  const section = change.section;
   
-  if (section === 'about' || section === 'hero' || section === 'experience') {
-    portfolio[section] = change.content;
-  } else if (section === 'skills') {
-    portfolio.skills = change.content;
-  } else if (section === 'projects') {
-    portfolio.projects = change.content;
-  } else if (section === 'certifications') {
-    portfolio.certifications = change.content;
+  if (MONGO_URI) {
+    const change = await Change.findOne({ id: changeId });
+    if (!change) return res.status(404).json({ error: 'Change proposal not found' });
+    if (change.status !== 'pending') return res.status(400).json({ error: `Change already ${change.status}` });
+
+    const portfolio = await getPortfolioData();
+    const section = change.section;
+    if (section === 'about' || section === 'hero' || section === 'experience') portfolio[section] = change.content;
+    else if (section === 'skills') portfolio.skills = change.content;
+    else if (section === 'projects') portfolio.projects = change.content;
+    else if (section === 'certifications') portfolio.certifications = change.content;
+    else return res.status(400).json({ error: `Unknown section: ${section}` });
+
+    change.status = 'approved';
+    change.approvedAt = new Date().toISOString();
+    await change.save();
+    await savePortfolioData(portfolio);
+    return res.json({ success: true, message: 'Change approved and applied successfully' });
   } else {
-    return res.status(400).json({ error: `Unknown section: ${section}` });
-  }
+    // Local File fallback logic
+    const changes = readJsonFile(CHANGES_FILE);
+    const changeIdx = changes.findIndex(c => c.id === changeId);
+    if (changeIdx === -1) return res.status(404).json({ error: 'Change proposal not found' });
+    const change = changes[changeIdx];
+    if (change.status !== 'pending') return res.status(400).json({ error: `Change already ${change.status}` });
 
-  // Update status of proposal
-  change.status = 'approved';
-  change.approvedAt = new Date().toISOString();
+    const portfolio = readJsonFile(PORTFOLIO_FILE, {});
+    const section = change.section;
+    if (section === 'about' || section === 'hero' || section === 'experience') portfolio[section] = change.content;
+    else if (section === 'skills') portfolio.skills = change.content;
+    else if (section === 'projects') portfolio.projects = change.content;
+    else if (section === 'certifications') portfolio.certifications = change.content;
+    else return res.status(400).json({ error: `Unknown section: ${section}` });
 
-  // Save changes to files
-  const savedPortfolio = writeJsonFile(PORTFOLIO_FILE, portfolio);
-  const savedChanges = writeJsonFile(CHANGES_FILE, changes);
-
-  if (savedPortfolio && savedChanges) {
-    res.json({ success: true, message: 'Change approved and applied successfully' });
-  } else {
-    res.status(500).json({ error: 'Failed to apply approval updates' });
+    change.status = 'approved';
+    change.approvedAt = new Date().toISOString();
+    const savedPortfolio = writeJsonFile(PORTFOLIO_FILE, portfolio);
+    const savedChanges = writeJsonFile(CHANGES_FILE, changes);
+    if (savedPortfolio && savedChanges) res.json({ success: true, message: 'Change approved and applied successfully' });
+    else res.status(500).json({ error: 'Failed to apply approval updates' });
   }
 });
 
-// Admin Endpoint: Reject a change proposal (Requires Auth)
-app.post('/api/portfolio/changes/:id/reject', requireAuth, (req, res) => {
+app.post('/api/portfolio/changes/:id/reject', requireAuth, async (req, res) => {
   const changeId = req.params.id;
-  const changes = readJsonFile(CHANGES_FILE);
-  const changeIdx = changes.findIndex(c => c.id === changeId);
-
-  if (changeIdx === -1) {
-    return res.status(404).json({ error: 'Change proposal not found' });
-  }
-
-  const change = changes[changeIdx];
-  if (change.status !== 'pending') {
-    return res.status(400).json({ error: `Change already ${change.status}` });
-  }
-
-  change.status = 'rejected';
-  change.rejectedAt = new Date().toISOString();
-
-  if (writeJsonFile(CHANGES_FILE, changes)) {
-    res.json({ success: true, message: 'Change rejected and discarded' });
+  if (MONGO_URI) {
+    const change = await Change.findOne({ id: changeId });
+    if (!change) return res.status(404).json({ error: 'Change proposal not found' });
+    if (change.status !== 'pending') return res.status(400).json({ error: `Change already ${change.status}` });
+    change.status = 'rejected';
+    change.rejectedAt = new Date().toISOString();
+    await change.save();
+    return res.json({ success: true, message: 'Change rejected and discarded' });
   } else {
-    res.status(500).json({ error: 'Failed to update change rejection status' });
+    const changes = readJsonFile(CHANGES_FILE);
+    const changeIdx = changes.findIndex(c => c.id === changeId);
+    if (changeIdx === -1) return res.status(404).json({ error: 'Change proposal not found' });
+    const change = changes[changeIdx];
+    if (change.status !== 'pending') return res.status(400).json({ error: `Change already ${change.status}` });
+    change.status = 'rejected';
+    change.rejectedAt = new Date().toISOString();
+    if (writeJsonFile(CHANGES_FILE, changes)) res.json({ success: true, message: 'Change rejected and discarded' });
+    else res.status(500).json({ error: 'Failed to update change rejection status' });
   }
 });
 
-// Admin Endpoint: Get contact messages (Requires Auth)
-app.get('/api/messages', requireAuth, (req, res) => {
-  const messages = readJsonFile(MESSAGES_FILE);
+app.get('/api/messages', requireAuth, async (req, res) => {
+  const messages = await getMessagesData();
   res.json(messages);
 });
 
-// Admin Endpoint: Mark a contact message as read (Requires Auth)
-app.post('/api/messages/:id/read', requireAuth, (req, res) => {
+app.post('/api/messages/:id/read', requireAuth, async (req, res) => {
   const msgId = req.params.id;
-  const messages = readJsonFile(MESSAGES_FILE);
-  const msgIdx = messages.findIndex(m => m.id === msgId);
-
-  if (msgIdx === -1) {
-    return res.status(404).json({ error: 'Message not found' });
-  }
-
-  messages[msgIdx].status = 'read';
-  if (writeJsonFile(MESSAGES_FILE, messages)) {
-    res.json({ success: true });
+  if (MONGO_URI) {
+    const msg = await Message.findOne({ id: msgId });
+    if (!msg) return res.status(404).json({ error: 'Message not found' });
+    msg.status = 'read';
+    await msg.save();
+    return res.json({ success: true });
   } else {
-    res.status(500).json({ error: 'Failed to update message status' });
+    const messages = readJsonFile(MESSAGES_FILE);
+    const msgIdx = messages.findIndex(m => m.id === msgId);
+    if (msgIdx === -1) return res.status(404).json({ error: 'Message not found' });
+    messages[msgIdx].status = 'read';
+    if (writeJsonFile(MESSAGES_FILE, messages)) res.json({ success: true });
+    else res.status(500).json({ error: 'Failed to update message status' });
   }
 });
 
-// Admin Endpoint: Delete a contact message (Requires Auth)
-app.delete('/api/messages/:id', requireAuth, (req, res) => {
+app.delete('/api/messages/:id', requireAuth, async (req, res) => {
   const msgId = req.params.id;
-  const messages = readJsonFile(MESSAGES_FILE);
-  const updatedMessages = messages.filter(m => m.id !== msgId);
-
-  if (messages.length === updatedMessages.length) {
-    return res.status(404).json({ error: 'Message not found' });
-  }
-
-  if (writeJsonFile(MESSAGES_FILE, updatedMessages)) {
-    res.json({ success: true });
+  if (MONGO_URI) {
+    const result = await Message.deleteOne({ id: msgId });
+    if (result.deletedCount === 0) return res.status(404).json({ error: 'Message not found' });
+    return res.json({ success: true });
   } else {
-    res.status(500).json({ error: 'Failed to delete message' });
+    const messages = readJsonFile(MESSAGES_FILE);
+    const updatedMessages = messages.filter(m => m.id !== msgId);
+    if (messages.length === updatedMessages.length) return res.status(404).json({ error: 'Message not found' });
+    if (writeJsonFile(MESSAGES_FILE, updatedMessages)) res.json({ success: true });
+    else res.status(500).json({ error: 'Failed to delete message' });
   }
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`====================================================`);
-  console.log(`🛡️  Cybersecurity Portfolio Server Running  🛡️`);
-  console.log(`🔗 Local Access: http://localhost:${PORT}`);
-  console.log(`====================================================`);
-});
+// For Vercel Serverless Function export
+module.exports = app;
+
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`====================================================`);
+    console.log(`🛡️  Cybersecurity Portfolio Server Running  🛡️`);
+    console.log(`🔗 Local Access: http://localhost:${PORT}`);
+    console.log(`====================================================`);
+  });
+}
