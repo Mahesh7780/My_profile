@@ -98,7 +98,7 @@ const certificationsData = [
 // ===== Dynamic Portfolio Data Loader & Global Handlers =====
 async function loadPortfolioData() {
     try {
-        const response = await fetch('/api/portfolio');
+        const response = await fetch('./data/portfolio.json');
         if (!response.ok) throw new Error('Failed to fetch portfolio data');
         const data = await response.json();
         
