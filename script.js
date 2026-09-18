@@ -1,4 +1,4 @@
-// ===== Cybersecurity Fresher Data =====
+// ===== Cybersecurity Profile Data =====
 const skillsData = {
     tools: [
         { name: "Nmap", level: 85 },
@@ -75,7 +75,7 @@ const certificationsData = [
         issuer: "Forage",
         date: "2024",
         icon: "fas fa-chart-line",
-        description: "Practical job simulation for fresher preparation"
+        description: "Practical cybersecurity analyst simulation"
     },
     {
         id: 3,
@@ -94,6 +94,127 @@ const certificationsData = [
         description: "Programming fundamentals certification"
     }
 ];
+
+// ===== Dynamic Portfolio Data Loader & Global Handlers =====
+async function loadPortfolioData() {
+    try {
+        const response = await fetch('/api/portfolio');
+        if (!response.ok) throw new Error('Failed to fetch portfolio data');
+        const data = await response.json();
+        
+        // Update data models
+        if (data.skills) {
+            Object.assign(skillsData, data.skills);
+        }
+        if (data.projects) {
+            projectsData.length = 0;
+            projectsData.push(...data.projects);
+        }
+        if (data.certifications) {
+            certificationsData.length = 0;
+            certificationsData.push(...data.certifications);
+        }
+        
+        // Update static DOM texts
+        if (data.about) {
+            const aboutTitle = document.querySelector('.about-title');
+            const aboutDesc = document.querySelector('.about-description');
+            if (typeof data.about === 'object') {
+                if (aboutTitle) aboutTitle.textContent = data.about.title || '';
+                if (aboutDesc) aboutDesc.textContent = data.about.description || '';
+            } else {
+                if (aboutTitle) aboutTitle.textContent = '';
+                if (aboutDesc) aboutDesc.textContent = data.about;
+            }
+        }
+        
+        if (data.hero) {
+            const heroDesc = document.querySelector('.hero-description');
+            if (heroDesc) heroDesc.textContent = data.hero.description;
+        }
+        
+        // Re-initialize skills, projects, certifications in DOM
+        initSkills();
+        initProjects();
+        initCertifications();
+        
+        console.log('✅ Dynamic portfolio data loaded from backend');
+    } catch (error) {
+        console.warn('⚠️ Server unreachable, falling back to static offline data:', error);
+        // If we fail, init DOM with the default hardcoded data
+        initSkills();
+        initProjects();
+        initCertifications();
+    }
+}
+
+// Bind to window for HTML onclick triggers
+window.approveChange = async (id) => {
+    try {
+        const response = await fetch(`/api/portfolio/changes/${id}/approve`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        const result = await response.json();
+        if (response.ok && result.success) {
+            showNotification('Change proposal approved and merged live!', 'success');
+            await loadPortfolioData(); // refresh live site
+            await loadAdminDashboardData(); // refresh dashboard
+        } else {
+            showNotification(`Approval failed: ${result.error || 'Unknown error'}`, 'error');
+        }
+    } catch (error) {
+        showNotification(`Error: ${error.message}`, 'error');
+    }
+};
+
+window.rejectChange = async (id) => {
+    try {
+        const response = await fetch(`/api/portfolio/changes/${id}/reject`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        const result = await response.json();
+        if (response.ok && result.success) {
+            showNotification('Change proposal rejected and discarded.', 'success');
+            await loadAdminDashboardData(); // refresh dashboard
+        } else {
+            showNotification(`Rejection failed: ${result.error || 'Unknown error'}`, 'error');
+        }
+    } catch (error) {
+        showNotification(`Error: ${error.message}`, 'error');
+    }
+};
+
+window.markMessageRead = async (id) => {
+    try {
+        const response = await fetch(`/api/messages/${id}/read`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        if (response.ok) {
+            await loadAdminDashboardData(); // refresh dashboard
+        }
+    } catch (error) {
+        console.error('Error marking message read:', error);
+    }
+};
+
+window.deleteMessage = async (id) => {
+    if (!confirm('Are you sure you want to delete this message?')) return;
+    try {
+        const response = await fetch(`/api/messages/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        if (response.ok) {
+            showNotification('Message deleted successfully', 'success');
+            await loadAdminDashboardData(); // refresh dashboard
+        }
+    } catch (error) {
+        console.error('Error deleting message:', error);
+    }
+};
 
 // ===== DOM Elements =====
 const terminalLoader = document.getElementById('terminalLoader');
@@ -117,7 +238,7 @@ const statNumbers = document.querySelectorAll('.stat-number');
 let currentTheme = localStorage.getItem('theme') || 'dark';
 let terminalHistory = [];
 let historyIndex = -1;
-const typingWords = ['CYBERSECURITY', 'ENTRY-LEVEL', 'FRESHER ROLE', 'SOC ANALYST', 'VAPT ENGINEER'];
+const typingWords = ['CYBERSECURITY', 'SOC ANALYSIS', 'VAPT', 'PENETRATION TESTING'];
 let currentWordIndex = 0;
 let currentCharIndex = 0;
 let isDeleting = false;
@@ -131,60 +252,60 @@ const terminalCommands = {
             return `
 Available Commands:
 • help          - Show this help message
-• about         - Display fresher profile
+• about         - Display professional profile
 • education     - Show academic background
 • skills        - Show technical skills
 • projects      - List security projects
 • experience    - Show internship learning
 • certifications - List certifications
-• fresher       - Fresher availability and goals
+• status        - Availability and career goals
 • clear         - Clear terminal
 • theme         - Toggle dark/light theme
 • matrix        - Toggle matrix background
 • date          - Show current date
 • whoami        - Display current user
 • contact       - Show contact information
-• hireme        - Why hire this fresher
+• hireme        - Why hire me
             `;
         }
     },
     about: {
-        description: 'About the cybersecurity fresher',
+        description: 'About the cybersecurity professional',
         execute: () => {
             return `
-Fresher Profile:
+Professional Profile:
 Name: Mahesh Garlapally
-Status: Cybersecurity Fresher
+Status: Cybersecurity Specialist
 Education: BCA Graduate (90% aggregate)
 Certification: CEH Training Completed
-Availability: Seeking first cybersecurity role
+Availability: Ready for cybersecurity challenges
 Target Roles: SOC Analyst, VAPT Engineer, Security Analyst
 Location: Hyderabad, Telangana
 Ready to Start: Immediately
             `;
         }
     },
-    fresher: {
-        description: 'Fresher availability and career goals',
+    status: {
+        description: 'Availability and career goals',
         execute: () => {
             return `
-Fresher Availability:
-✅ Status: Actively seeking first job
+Professional Status:
+✅ Status: Available for security roles
 🎓 Education: BCA (90% aggregate) - Completed
 📜 Certification: CEH - Completed
 💼 Experience: Cybersecurity Internship - Completed
 🎯 Target Roles: SOC Analyst, VAPT Engineer, Security Analyst
-📍 Location: Hyderabad, willing to relocate locally
+📍 Location: Hyderabad, willing to relocate
 📅 Start Date: Can join immediately
-🎯 Career Goal: Start cybersecurity career and grow with organization
+🎯 Career Goal: Protect digital assets and strengthen organization security posture
             `;
         }
     },
     hireme: {
-        description: 'Reasons to hire this fresher',
+        description: 'Reasons to hire me',
         execute: () => {
             return `
-Why Hire This Fresher:
+Why Hire Me:
 1. Strong Academic Background (90% BCA aggregate)
 2. CEH Certification completed
 3. Hands-on internship experience
@@ -193,8 +314,8 @@ Why Hire This Fresher:
 6. Technical skills in security tools
 7. Ready to start immediately
 8. Strong foundation in cybersecurity
-9. Passionate about security
-10. Eager to learn and contribute
+9. Passionate about security operations
+10. Rapid learner and proactive problem solver
             `;
         }
     },
@@ -307,7 +428,7 @@ Professional Certifications:
     whoami: {
         description: 'Display current user',
         execute: () => {
-            return 'fresher@cyberportfolio';
+            return 'mahesh@cyberportfolio';
         }
     },
     contact: {
@@ -341,6 +462,7 @@ function createMatrixBackground() {
     canvas.style.height = '100%';
     canvas.style.zIndex = '-1';
     canvas.style.opacity = '0.3';
+    canvas.style.display = 'none';
     matrixBg.appendChild(canvas);
     
     const ctx = canvas.getContext('2d');
@@ -358,10 +480,12 @@ function createMatrixBackground() {
     const drops = Array(columns).fill(1);
     
     function draw() {
-        ctx.fillStyle = 'rgba(10, 10, 10, 0.05)';
+        const isLightTheme = document.documentElement.getAttribute('data-theme') === 'light';
+        ctx.fillStyle = isLightTheme ? 'rgba(247, 244, 235, 0.05)' : 'rgba(12, 11, 10, 0.05)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
-        ctx.fillStyle = '#00ff88';
+        const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#d4b27a';
+        ctx.fillStyle = primaryColor;
         ctx.font = `${fontSize}px monospace`;
         
         // Update columns if window resized
@@ -416,7 +540,7 @@ function initPreloader() {
             startTypingAnimation();
             initCounters();
             createMatrixBackground();
-            console.log('🚀 Cybersecurity Fresher Portfolio loaded successfully');
+            console.log('🚀 Cybersecurity Portfolio loaded successfully');
         }, 500);
     }, animationTime);
 }
@@ -678,7 +802,7 @@ function processCommand(command) {
     const output = terminalBody.querySelector('.terminal-output');
     const inputLine = document.createElement('div');
     inputLine.className = 'terminal-line';
-    inputLine.innerHTML = `<span class="prompt">fresher@cyberportfolio:~$</span> ${command}`;
+    inputLine.innerHTML = `<span class="prompt">mahesh@cyberportfolio:~$</span> ${command}`;
     output.appendChild(inputLine);
     
     // Process command
@@ -693,13 +817,13 @@ function processCommand(command) {
     } else if (baseCommand === 'echo') {
         result = commandParts.slice(1).join(' ');
     } else if (baseCommand === 'pwd') {
-        result = '/home/fresher/cyberportfolio';
+        result = '/home/mahesh/cyberportfolio';
     } else if (baseCommand === 'tryhackme') {
         result = 'TryHackMe Profile: Active (50+ rooms completed)\nLearning Path: Complete Beginner to Junior Pentester';
     } else if (baseCommand === 'htb') {
-        result = 'Hack The Box: Beginner level\nFocus: Learning fundamentals for job readiness';
+        result = 'Hack The Box: Beginner level\nFocus: Active threat research and security labs';
     } else if (baseCommand === 'job') {
-        result = 'Job Search Status: Active\nTarget: Entry-level cybersecurity roles\nLocation: Hyderabad\nAvailability: Immediate';
+        result = 'Job Search Status: Active\nTarget: Cybersecurity Analyst & Specialist roles\nLocation: Hyderabad\nAvailability: Immediate';
     } else {
         result = 'Command not found. Type "help" for available commands.';
     }
@@ -722,15 +846,7 @@ function initSkills() {
     const toolsSkills = document.getElementById('toolsSkills');
     if (toolsSkills) {
         toolsSkills.innerHTML = skillsData.tools.map(skill => `
-            <div class="skill-item">
-                <div class="skill-header">
-                    <span class="skill-name">${skill.name}</span>
-                    <span class="skill-percent">${skill.level}%</span>
-                </div>
-                <div class="skill-bar">
-                    <div class="skill-level" style="width: ${skill.level}%"></div>
-                </div>
-            </div>
+            <span class="skill-tag">${skill.name}</span>
         `).join('');
     }
     
@@ -738,15 +854,7 @@ function initSkills() {
     const programmingSkills = document.getElementById('programmingSkills');
     if (programmingSkills) {
         programmingSkills.innerHTML = skillsData.programming.map(skill => `
-            <div class="skill-item">
-                <div class="skill-header">
-                    <span class="skill-name">${skill.name}</span>
-                    <span class="skill-percent">${skill.level}%</span>
-                </div>
-                <div class="skill-bar">
-                    <div class="skill-level" style="width: ${skill.level}%"></div>
-                </div>
-            </div>
+            <span class="skill-tag">${skill.name}</span>
         `).join('');
     }
     
@@ -754,15 +862,7 @@ function initSkills() {
     const cyberSkills = document.getElementById('cyberSkills');
     if (cyberSkills) {
         cyberSkills.innerHTML = skillsData.cyber.map(skill => `
-            <div class="skill-item">
-                <div class="skill-header">
-                    <span class="skill-name">${skill.name}</span>
-                    <span class="skill-percent">${skill.level}%</span>
-                </div>
-                <div class="skill-bar">
-                    <div class="skill-level" style="width: ${skill.level}%"></div>
-                </div>
-            </div>
+            <span class="skill-tag">${skill.name}</span>
         `).join('');
     }
     
@@ -770,15 +870,7 @@ function initSkills() {
     const platformSkills = document.getElementById('platformSkills');
     if (platformSkills) {
         platformSkills.innerHTML = skillsData.platforms.map(skill => `
-            <div class="skill-item">
-                <div class="skill-header">
-                    <span class="skill-name">${skill.name}</span>
-                    <span class="skill-percent">${skill.level}%</span>
-                </div>
-                <div class="skill-bar">
-                    <div class="skill-level" style="width: ${skill.level}%"></div>
-                </div>
-            </div>
+            <span class="skill-tag">${skill.name}</span>
         `).join('');
     }
 }
@@ -810,7 +902,7 @@ function initProjects() {
                 </div>
                 <div class="project-footer">
                     <span class="project-date">${project.date}</span>
-                    <a href="#" class="project-link" onclick="return false;">
+                    <a href="${project.link || '#'}" class="project-link" ${project.link ? 'target="_blank"' : 'onclick="return false;"'}>
                         View Details
                         <i class="fas fa-arrow-right"></i>
                     </a>
@@ -891,7 +983,7 @@ function initContactForm() {
         const formData = {
             name: this.querySelector('#name').value.trim(),
             email: this.querySelector('#email').value.trim(),
-            inquiry: this.querySelector('#inquiry').value,
+            inquiry: this.querySelector('#inquiry') ? this.querySelector('#inquiry').value : 'General Inquiry',
             message: this.querySelector('#message').value.trim()
         };
         
@@ -904,19 +996,38 @@ function initContactForm() {
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
         submitBtn.disabled = true;
         
-        // Simulate sending
-        setTimeout(() => {
-            console.log('Job opportunity submitted:', formData);
-            showNotification('Opportunity details sent! I\'ll respond promptly.', 'success');
-            contactForm.reset();
+        // Send to backend
+        fetch('/api/contact', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name: formData.name,
+                email: formData.email,
+                inquiry: formData.inquiry,
+                message: formData.message,
+                company: this.querySelector('#company') ? this.querySelector('#company').value.trim() : ''
+            })
+        })
+        .then(response => response.json().then(data => {
+            if (response.ok && data.success) {
+                showNotification('Opportunity details sent! I\'ll respond promptly.', 'success');
+                contactForm.reset();
+            } else {
+                showNotification(`Failed to send message: ${data.error || 'Server error'}`, 'error');
+            }
+        }))
+        .catch(err => {
+            showNotification(`Network error: ${err.message}`, 'error');
+        })
+        .finally(() => {
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
-        }, 1500);
+        });
     });
 }
 
 function validateContactForm(data) {
-    if (!data.name || !data.email || !data.inquiry || !data.message) {
+    if (!data.name || !data.email || !data.message) {
         showNotification('Please fill in all required fields.', 'error');
         return false;
     }
@@ -1024,7 +1135,7 @@ function setupCleanup() {
 
 // ===== Initialize Everything =====
 function init() {
-    console.log('🚀 Cybersecurity Fresher Portfolio Initialized');
+    console.log('🚀 Cybersecurity Portfolio Initialized');
     
     // Add notification styles
     addNotificationStyles();
@@ -1070,7 +1181,7 @@ const permissions = {
     user: [
         'help', 'about', 'education', 'skills', 'projects', 
         'experience', 'certifications', 'contact', 'hireme',
-        'fresher', 'whoami', 'date', 'clear', 'theme', 'matrix',
+        'status', 'whoami', 'date', 'clear', 'theme', 'matrix',
         'ls', 'pwd', 'echo', 'tryhackme', 'htb', 'job',
         'su'  // Can request root access
     ],
@@ -1086,6 +1197,7 @@ const permissions = {
 // Default password (can be changed by user)
 let rootPassword = "cybersecurity"; // Default
 let isRootMode = false;
+let adminToken = sessionStorage.getItem('adminToken') || '';
 
 // ===== Security Modal Functions =====
 function showSecurityModal() {
@@ -1145,15 +1257,15 @@ const userCommands = {
             let helpText = `
 Available Commands (User Mode):
 • help          - Show this help message
-• about         - Display fresher profile (read-only)
+• about         - Display professional profile (read-only)
 • education     - Show academic background (read-only)
 • skills        - Show technical skills (read-only)
 • projects      - List security projects (read-only)
 • experience    - Show internship learning (read-only)
 • certifications - List certifications (read-only)
 • contact       - Show contact information (read-only)
-• hireme        - Why hire this fresher (read-only)
-• fresher       - Fresher availability and goals
+• hireme        - Why hire me (read-only)
+• status        - Availability and career goals
 • clear         - Clear terminal
 • theme         - Toggle dark/light theme
 • matrix        - Toggle matrix background
@@ -1165,7 +1277,7 @@ Available Commands (User Mode):
 • tryhackme     - Show TryHackMe progress
 • htb           - Show Hack The Box progress
 • job           - Job search status
-
+ 
 🔐 Restricted Commands (require root access):
 • edit          - Modify portfolio content
 • config        - Open configuration panel
@@ -1173,7 +1285,7 @@ Available Commands (User Mode):
 • backup        - Create backup
 • scan          - Run security scan
 • logs          - View system logs
-
+ 
 Type "su [password]" to switch to root user.
 Default password hint: Think about cybersecurity
             `;
@@ -1182,19 +1294,19 @@ Default password hint: Think about cybersecurity
     },
     
     about: {
-        description: 'Display fresher profile (read-only)',
+        description: 'Display professional profile (read-only)',
         execute: () => {
             return `
-Fresher Profile (Read-Only):
+Professional Profile (Read-Only):
 Name: Mahesh Garlapally
-Status: Cybersecurity Fresher
+Status: Cybersecurity Specialist
 Education: BCA Graduate (90% aggregate)
 Certification: CEH Training Completed
-Availability: Seeking first cybersecurity role
+Availability: Ready for cybersecurity challenges
 Target Roles: SOC Analyst, VAPT Engineer, Security Analyst
 Location: Hyderabad, Telangana
 Ready to Start: Immediately
-
+ 
 🔒 To modify this information, use: su [password]
             `;
         }
@@ -1268,13 +1380,31 @@ Professional Certifications (Read-Only):
     
     su: {
         description: 'Switch to root user (elevated privileges)',
-        execute: (args) => {
+        execute: async (args) => {
             if (args.length > 0) {
-                if (args[0] === rootPassword) {
-                    activateRootMode();
-                    return '✅ Root access granted. Elevated privileges activated.\nType "help" for root commands.';
-                } else {
-                    return '❌ Access denied. Incorrect password.\nHint: Think about cybersecurity certification';
+                let password = args[0];
+                if ((password.startsWith('[') && password.endsWith(']')) ||
+                    (password.startsWith('"') && password.endsWith('"')) ||
+                    (password.startsWith("'") && password.endsWith("'"))) {
+                    password = password.slice(1, -1);
+                }
+                try {
+                    const response = await fetch('/api/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ password: password })
+                    });
+                    const data = await response.json();
+                    if (response.ok && data.success) {
+                        sessionStorage.setItem('adminToken', data.token);
+                        adminToken = data.token;
+                        activateRootMode();
+                        return '✅ Root access granted. Elevated privileges activated.\nType "help" for root commands.';
+                    } else {
+                        return `❌ Access denied. ${data.error || 'Incorrect password.'}`;
+                    }
+                } catch (error) {
+                    return `❌ Authentication error: ${error.message}`;
                 }
             } else {
                 return 'Usage: su [password]\nTo modify portfolio details, root access is required.';
@@ -1285,7 +1415,7 @@ Professional Certifications (Read-Only):
     // Read-only versions of other commands
     education: terminalCommands.education,
     contact: terminalCommands.contact,
-    fresher: terminalCommands.fresher,
+    status: terminalCommands.status,
     hireme: terminalCommands.hireme,
     clear: terminalCommands.clear,
     theme: terminalCommands.theme,
@@ -1450,7 +1580,7 @@ Root Commands (Elevated Privileges):
 };
 
 // ===== Command Execution Handler =====
-function executeCommand(baseCommand, args) {
+async function executeCommand(baseCommand, args) {
     // Check permissions first
     const permissionError = checkPermission(baseCommand);
     if (permissionError) {
@@ -1461,12 +1591,12 @@ function executeCommand(baseCommand, args) {
     if (isRootMode) {
         // Root mode commands
         if (rootCommands[baseCommand]) {
-            return rootCommands[baseCommand].execute(args);
+            return await rootCommands[baseCommand].execute(args);
         }
     } else {
         // User mode commands
         if (userCommands[baseCommand]) {
-            return userCommands[baseCommand].execute(args);
+            return await userCommands[baseCommand].execute(args);
         }
     }
     
@@ -1479,22 +1609,22 @@ function executeCommand(baseCommand, args) {
                 return 'about.txt\neducation.txt\nskills.txt\nprojects.txt\nexperience.txt\ncertifications.txt\ncontact.txt\nhireme.txt\nREADME.md';
             }
         case 'pwd':
-            return isRootMode ? '/root/cyberportfolio' : '/home/fresher/cyberportfolio';
+            return isRootMode ? '/root/cyberportfolio' : '/home/mahesh/cyberportfolio';
         case 'echo':
             return args.join(' ');
         case 'tryhackme':
             return 'TryHackMe Profile: Active (50+ rooms completed)\nLearning Path: Complete Beginner to Junior Pentester\nStatus: Read-only (User mode)';
         case 'htb':
-            return 'Hack The Box: Beginner level\nFocus: Learning fundamentals for job readiness\nStatus: Read-only (User mode)';
+            return 'Hack The Box: Beginner level\nFocus: Active threat research and security labs\nStatus: Read-only (User mode)';
         case 'job':
-            return 'Job Search Status: Active\nTarget: Entry-level cybersecurity roles\nLocation: Hyderabad\nAvailability: Immediate\nStatus: Read-only (User mode)';
+            return 'Job Search Status: Active\nTarget: Cybersecurity Analyst & Specialist roles\nLocation: Hyderabad\nAvailability: Immediate\nStatus: Read-only (User mode)';
         default:
             return 'Command not found. Type "help" for available commands.';
     }
 }
 
 // ===== Updated processCommand Function =====
-function processCommand(command) {
+async function processCommand(command) {
     // Add to history
     terminalHistory.push(command);
     historyIndex = -1;
@@ -1509,7 +1639,7 @@ function processCommand(command) {
     if (isRootMode) {
         promptText = '<span class="prompt root-prompt">root@cyberportfolio:~#</span>';
     } else {
-        promptText = '<span class="prompt">fresher@cyberportfolio:~$</span>';
+        promptText = '<span class="prompt">mahesh@cyberportfolio:~$</span>';
     }
     
     inputLine.innerHTML = `${promptText} ${command}`;
@@ -1520,15 +1650,23 @@ function processCommand(command) {
     const baseCommand = commandParts[0].toLowerCase();
     const args = commandParts.slice(1);
     
-    // Execute command
-    const result = executeCommand(baseCommand, args);
-    
-    // Display result
-    if (result) {
-        const resultLine = document.createElement('div');
-        resultLine.className = 'terminal-line';
-        resultLine.innerHTML = result.replace(/\n/g, '<br>');
-        output.appendChild(resultLine);
+    try {
+        // Execute command
+        const result = await executeCommand(baseCommand, args);
+        
+        // Display result
+        if (result) {
+            const resultLine = document.createElement('div');
+            resultLine.className = 'terminal-line';
+            resultLine.innerHTML = result.replace(/\n/g, '<br>');
+            output.appendChild(resultLine);
+        }
+    } catch (err) {
+        const errorLine = document.createElement('div');
+        errorLine.className = 'terminal-line';
+        errorLine.style.color = 'var(--danger)';
+        errorLine.innerHTML = `Error: ${err.message}`;
+        output.appendChild(errorLine);
     }
     
     // Scroll to bottom
@@ -1575,7 +1713,7 @@ function deactivateRootMode() {
     // Update terminal prompt
     const prompts = document.querySelectorAll('.prompt');
     prompts.forEach(prompt => {
-        prompt.textContent = 'fresher@cyberportfolio:~$';
+        prompt.textContent = 'mahesh@cyberportfolio:~$';
         prompt.classList.remove('root-prompt');
     });
     
@@ -1738,7 +1876,7 @@ function initSecuritySystem() {
 
 // ===== Update Initialization =====
 function init() {
-    console.log('🚀 Cybersecurity Fresher Portfolio Initialized');
+    console.log('🚀 Cybersecurity Portfolio Initialized');
     
     // Initialize all systems
     addNotificationStyles();
@@ -2276,95 +2414,157 @@ function formatBytes(bytes, decimals = 2) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
-// ===== Updated Root Commands with Save Integration =====
+// ===== Updated Root Commands with Server Integration =====
 const enhancedRootCommands = {
     ...rootCommands,
     
-    save: {
-        description: 'Save changes immediately',
+    exit: {
+        description: 'Exit root mode',
         execute: () => {
-            saveChanges();
-            return 'Save completed.';
+            sessionStorage.removeItem('adminToken');
+            adminToken = '';
+            deactivateRootMode();
+            return 'Exited root mode. Returning to user mode.';
         }
     },
-    
-    savemode: {
-        description: 'Change save mode',
-        execute: (args) => {
-            if (args.length > 0) {
-                const mode = args[0].toLowerCase();
-                if (setSaveMode(mode)) {
-                    return `Save mode changed to: ${mode}`;
-                } else {
-                    return 'Invalid mode. Use: permanent, temporary, none';
+
+    pending: {
+        description: 'List pending change proposals',
+        execute: async () => {
+            try {
+                const response = await fetch('/api/portfolio/changes', {
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                const changes = await response.json();
+                const pending = changes.filter(c => c.status === 'pending');
+                if (pending.length === 0) {
+                    return 'No pending change proposals.';
                 }
+                let output = 'Pending Change Proposals:\n─────────────────────────\n';
+                pending.forEach(c => {
+                    output += `ID: ${c.id}\nSection: ${c.section}\nDescription: ${c.description}\nTime: ${new Date(c.timestamp).toLocaleString()}\n\n`;
+                });
+                output += 'Use "approve [id]" or "reject [id]" to manage these proposals.';
+                return output;
+            } catch (error) {
+                return `Error fetching changes: ${error.message}`;
             }
-            return `Current save mode: ${saveMode}\nUsage: savemode [permanent|temporary|none]`;
         }
     },
-    
-    changes: {
-        description: 'Show unsaved changes',
-        execute: () => {
-            if (unsavedChanges.length === 0) {
-                return 'No unsaved changes.';
+
+    approve: {
+        description: 'Approve a change proposal and make it live',
+        execute: async (args) => {
+            if (args.length === 0) return 'Usage: approve [change_id]';
+            const changeId = args[0];
+            try {
+                const response = await fetch(`/api/portfolio/changes/${changeId}/approve`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    await loadPortfolioData(); // refresh live site
+                    return `✅ Change ${changeId} approved and applied successfully.`;
+                } else {
+                    return `❌ Approval failed: ${result.error || 'Unknown error'}`;
+                }
+            } catch (error) {
+                return `Error approving change: ${error.message}`;
             }
-            
-            let output = `Unsaved changes (${unsavedChanges.length}):\n`;
-            unsavedChanges.forEach((change, index) => {
-                output += `${index + 1}. ${change.description} (${new Date(change.timestamp).toLocaleTimeString()})\n`;
-            });
-            
-            output += `\nType "save" to save or "discard" to clear.`;
-            return output;
         }
     },
-    
-    discard: {
-        description: 'Discard unsaved changes',
-        execute: () => {
-            const count = unsavedChanges.length;
-            unsavedChanges = [];
-            updateSaveUI();
-            return `Discarded ${count} unsaved change${count > 1 ? 's' : ''}.`;
+
+    reject: {
+        description: 'Reject a change proposal',
+        execute: async (args) => {
+            if (args.length === 0) return 'Usage: reject [change_id]';
+            const changeId = args[0];
+            try {
+                const response = await fetch(`/api/portfolio/changes/${changeId}/reject`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    return `✅ Change ${changeId} rejected and discarded.`;
+                } else {
+                    return `❌ Rejection failed: ${result.error || 'Unknown error'}`;
+                }
+            } catch (error) {
+                return `Error rejecting change: ${error.message}`;
+            }
         }
     },
-    
-    storage: {
-        description: 'Show storage information',
+
+    messages: {
+        description: 'View contact form messages',
+        execute: async () => {
+            try {
+                const response = await fetch('/api/messages', {
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                const msgs = await response.json();
+                if (msgs.length === 0) {
+                    return 'No contact messages received.';
+                }
+                let output = 'Visitor Messages:\n────────────────\n';
+                msgs.forEach(m => {
+                    output += `[${new Date(m.timestamp).toLocaleDateString()}] ${m.name} (${m.email})\nInquiry: ${m.inquiry}\nMessage: ${m.message}\nStatus: ${m.status.toUpperCase()}\nID: ${m.id}\n\n`;
+                });
+                return output;
+            } catch (error) {
+                return `Error fetching messages: ${error.message}`;
+            }
+        }
+    },
+
+    sysinfo: {
+        description: 'Show system information',
         execute: () => {
-            const permChanges = JSON.parse(localStorage.getItem('portfolioChanges') || '[]');
-            const tempChanges = JSON.parse(sessionStorage.getItem('portfolioChanges') || '[]');
-            
             return `
-Storage Information:
-───────────────────
-Current Mode: ${saveMode}
-Permanent Changes: ${permChanges.length}
-Temporary Changes: ${tempChanges.length}
-Unsaved Changes: ${unsavedChanges.length}
-Total Saved: ${parseInt(localStorage.getItem('changeCount') || '0') + 
-               parseInt(sessionStorage.getItem('changeCount') || '0')}
-Last Save: ${lastSaveTime ? lastSaveTime.toLocaleTimeString() : 'Never'}
+System Information (Root Mode):
+• User: root
+• Access Level: Administrator
+• Session Start: ${new Date().toLocaleString()}
+• Theme: ${currentTheme}
+• Backend: Node.js Express (Connected)
+• Database: JSON-based file persistence
+• Security Status: Elevated Privileges
             `;
         }
     },
     
-    backup: {
-        ...rootCommands.backup,
+    help: {
+        description: 'Display root commands',
         execute: () => {
-            exportChanges();
-            return 'Backup/export initiated.';
+            return `
+Root Commands (Elevated Privileges):
+• exit          - Exit root mode
+• edit          - Propose portfolio edit via terminal
+• config        - Open Root Admin Dashboard UI
+• pending       - List pending change proposals
+• approve [id]  - Approve and apply change proposal
+• reject [id]   - Reject and discard change proposal
+• messages      - View visitor contact messages
+• sysinfo       - Show system information
+• theme         - Toggle dark/light theme
+• matrix        - Toggle matrix background
+• date          - Show current date
+• clear         - Clear terminal
+• ls            - List files
+• pwd           - Print working directory
+            `;
         }
     }
 };
 
-// ===== Updated Edit Command with Save Tracking =====
+// ===== Updated Edit Command with Server Integration =====
 const enhancedEditCommand = {
     ...rootCommands.edit,
-    execute: (args) => {
+    execute: async (args) => {
         if (args.length < 2) {
-            return 'Usage: edit [section] [content]\nSections: about, skills, projects, experience';
+            return 'Usage: edit [section] [content]\nSections: about, hero';
         }
         
         const section = args[0];
@@ -2373,24 +2573,16 @@ const enhancedEditCommand = {
         const sections = {
             about: {
                 element: document.querySelector('.about-description'),
-                default: 'As a recent BCA graduate with strong academic performance (90% aggregate) and CEH certification, I have built a solid foundation in cybersecurity...'
+                name: 'About Me Description'
             },
-            skills: {
-                element: document.querySelector('.skills-container'),
-                default: 'Skills container'
-            },
-            projects: {
-                element: document.getElementById('projectsGrid'),
-                default: 'Projects grid'
-            },
-            experience: {
-                element: document.querySelector('.experience-content p'),
-                default: 'Gained practical experience in cybersecurity fundamentals...'
+            hero: {
+                element: document.querySelector('.hero-description'),
+                name: 'Hero Description'
             }
         };
         
         if (!sections[section]) {
-            return `❌ Invalid section. Available: ${Object.keys(sections).join(', ')}`;
+            return `❌ Invalid section. Available: about, hero`;
         }
         
         const element = sections[section].element;
@@ -2398,24 +2590,34 @@ const enhancedEditCommand = {
             return `❌ Section element not found.`;
         }
         
-        // Save old content for undo
-        const oldContent = element.innerHTML;
+        const oldContent = element.textContent.trim();
         
-        // Apply change
-        element.textContent = content;
-        
-        // Track change
-        const changeId = trackChange({
-            type: 'edit',
-            section: section,
-            description: `Edited ${section} section`,
-            content: content,
-            oldContent: oldContent,
-            elementId: element.id || null,
-            timestamp: new Date().toISOString()
-        });
-        
-        return `✅ "${section}" section updated. (Change ID: ${changeId})`;
+        try {
+            const response = await fetch('/api/portfolio/propose', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${adminToken}`
+                },
+                body: JSON.stringify({
+                    type: 'edit',
+                    section: section,
+                    description: `Edited ${sections[section].name} via terminal`,
+                    content: content,
+                    oldContent: oldContent,
+                    elementId: section
+                })
+            });
+            
+            const result = await response.json();
+            if (response.ok && result.success) {
+                return `✅ Change proposal submitted. (Change ID: ${result.change.id})\nUse "pending" to see proposed changes, or "approve [id]" to publish it.`;
+            } else {
+                return `❌ Propose failed: ${result.error || 'Unknown error'}`;
+            }
+        } catch (error) {
+            return `❌ Network error: ${error.message}`;
+        }
     }
 };
 
@@ -2494,9 +2696,782 @@ function setupBeforeUnloadWarning() {
     });
 }
 
+// ===== Root Control Panel and Admin Dashboard =====
+let tempSkills = null;
+let tempProjects = null;
+let tempCertifications = null;
+
+function initRootControls() {
+    const closeBtn = document.getElementById('closeAdminPanelBtn');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeAdminControls);
+    }
+    
+    // Handle tab switching
+    const tabBtns = document.querySelectorAll('.admin-tabs .tab-btn');
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            tabBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            const tabId = btn.dataset.tab;
+            const panes = document.querySelectorAll('.admin-tab-content .tab-pane');
+            panes.forEach(pane => {
+                pane.classList.remove('active');
+                if (pane.id === tabId) pane.classList.add('active');
+            });
+        });
+    });
+    
+    // Render dynamic form when section changes
+    const editSelect = document.getElementById('editSectionSelect');
+    if (editSelect) {
+        editSelect.addEventListener('change', () => {
+            renderEditForm(editSelect.value);
+        });
+    }
+    
+    console.log('🔒 Root Admin Dashboard initialized');
+}
+
+function openRootControls() {
+    if (!isRootMode) {
+        showAccessDenied();
+        return;
+    }
+    
+    // Initialize temp copies
+    tempSkills = JSON.parse(JSON.stringify(skillsData));
+    tempProjects = JSON.parse(JSON.stringify(projectsData));
+    tempCertifications = JSON.parse(JSON.stringify(certificationsData));
+    
+    // Render default dynamic form (About)
+    const editSelect = document.getElementById('editSectionSelect');
+    if (editSelect) {
+        editSelect.value = 'about';
+        renderEditForm('about');
+    }
+    
+    // Load data from backend
+    loadAdminDashboardData();
+    
+    // Open modal
+    const modal = document.getElementById('adminPanelModal');
+    if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeAdminControls() {
+    const modal = document.getElementById('adminPanelModal');
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+}
+
+function renderEditForm(section) {
+    const container = document.getElementById('dynamicEditFormContainer');
+    if (!container) return;
+    
+    if (section === 'about') {
+        const aboutTitle = document.querySelector('.about-title');
+        const aboutDesc = document.querySelector('.about-description');
+        const currentTitle = aboutTitle ? aboutTitle.textContent.trim() : '';
+        const currentDesc = aboutDesc ? aboutDesc.textContent.trim() : '';
+        
+        container.innerHTML = `
+            <div class="form-group-admin">
+                <label for="aboutTitleInput">About Title:</label>
+                <input type="text" id="aboutTitleInput" class="admin-input" value="${escapeHtml(currentTitle)}">
+            </div>
+            <div class="form-group-admin">
+                <label for="aboutDescInput">About Description:</label>
+                <textarea id="aboutDescInput" class="admin-input" rows="6">${escapeHtml(currentDesc)}</textarea>
+            </div>
+            <button class="btn btn-primary" onclick="proposeAboutChanges()">
+                <i class="fas fa-paper-plane"></i> Propose About Updates
+            </button>
+        `;
+    } else if (section === 'hero') {
+        const heroDesc = document.querySelector('.hero-description');
+        const currentDesc = heroDesc ? heroDesc.textContent.trim() : '';
+        
+        container.innerHTML = `
+            <div class="form-group-admin">
+                <label for="heroDescInput">Hero Description:</label>
+                <textarea id="heroDescInput" class="admin-input" rows="6">${escapeHtml(currentDesc)}</textarea>
+            </div>
+            <button class="btn btn-primary" onclick="proposeHeroChanges()">
+                <i class="fas fa-paper-plane"></i> Propose Hero Updates
+            </button>
+        `;
+    } else if (section === 'skills') {
+        renderSkillsEditForm();
+    } else if (section === 'projects') {
+        renderProjectsEditForm();
+    } else if (section === 'certifications') {
+        renderCertificationsEditForm();
+    }
+}
+
+// ===== SKILLS FORM =====
+function renderSkillsEditForm() {
+    const container = document.getElementById('dynamicEditFormContainer');
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="admin-sub-section">
+            <h4 class="admin-sub-section-title">Add New Skill</h4>
+            <div class="form-row-admin">
+                <div class="form-group-admin">
+                    <label for="newSkillName">Skill Name:</label>
+                    <input type="text" id="newSkillName" class="admin-input" placeholder="e.g. Wireshark">
+                </div>
+                <div class="form-group-admin">
+                    <label for="newSkillLevel">Skill Level (0-100%):</label>
+                    <input type="number" id="newSkillLevel" class="admin-input" min="0" max="100" value="80">
+                </div>
+            </div>
+            <div class="form-group-admin">
+                <label for="newSkillCategory">Skill Category:</label>
+                <select id="newSkillCategory" class="admin-input">
+                    <option value="tools">Security Tools</option>
+                    <option value="programming">Programming Languages</option>
+                    <option value="cyber">Cybersecurity Areas</option>
+                    <option value="platforms">Platforms & Knowledge</option>
+                </select>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="addSkillLocal()">
+                <i class="fas fa-plus"></i> Add Skill to Draft
+            </button>
+        </div>
+
+        <h4 style="font-family: var(--font-heading); font-size: 0.9rem; color: var(--text-primary); margin-bottom: 0.5rem; text-transform: uppercase;">Current Skills Draft</h4>
+        <div id="adminSkillsListContainer" class="admin-list-container"></div>
+
+        <button class="btn btn-primary" onclick="proposeSkillsChanges()">
+            <i class="fas fa-paper-plane"></i> Propose Skills Changes
+        </button>
+    `;
+
+    renderSkillsEditList();
+}
+
+function renderSkillsEditList() {
+    const listContainer = document.getElementById('adminSkillsListContainer');
+    if (!listContainer) return;
+
+    if (!tempSkills || Object.keys(tempSkills).length === 0) {
+        listContainer.innerHTML = '<div class="empty-state">No skills defined in draft.</div>';
+        return;
+    }
+
+    let itemsHtml = '';
+    const categories = {
+        tools: 'Security Tools',
+        programming: 'Programming',
+        cyber: 'Cybersecurity Areas',
+        platforms: 'Platforms & Knowledge'
+    };
+
+    Object.keys(categories).forEach(catKey => {
+        const catName = categories[catKey];
+        const list = tempSkills[catKey] || [];
+        if (list.length > 0) {
+            itemsHtml += `<div style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--primary); margin: 0.5rem 0.25rem 0.25rem;">[${catName.toUpperCase()}]</div>`;
+            list.forEach((skill, idx) => {
+                itemsHtml += `
+                    <div class="admin-list-item">
+                        <div class="admin-list-item-info">
+                            <span class="admin-list-item-title">${escapeHtml(skill.name)}</span>
+                            <span class="admin-list-item-subtitle">Level: ${skill.level}%</span>
+                        </div>
+                        <div class="admin-list-item-actions">
+                            <button class="btn btn-sm btn-primary" onclick="editSkillLocal('${catKey}', ${idx})" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="removeSkillLocal('${catKey}', ${idx})" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+    });
+
+    listContainer.innerHTML = itemsHtml || '<div class="empty-state">No skills defined in draft.</div>';
+}
+
+window.addSkillLocal = () => {
+    const nameInput = document.getElementById('newSkillName');
+    const levelInput = document.getElementById('newSkillLevel');
+    const catInput = document.getElementById('newSkillCategory');
+    if (!nameInput || !levelInput || !catInput) return;
+
+    const name = nameInput.value.trim();
+    const level = parseInt(levelInput.value);
+    const cat = catInput.value;
+
+    if (!name || isNaN(level)) {
+        showNotification('Please enter a valid skill name and level.', 'warning');
+        return;
+    }
+
+    if (!tempSkills[cat]) tempSkills[cat] = [];
+    tempSkills[cat].push({ name, level });
+
+    // Reset inputs
+    nameInput.value = '';
+    
+    // Refresh list
+    renderSkillsEditList();
+    showNotification(`Added ${name} to your skills draft. Click Propose changes when done.`, 'info');
+};
+
+window.removeSkillLocal = (cat, idx) => {
+    if (tempSkills[cat] && tempSkills[cat][idx]) {
+        const removed = tempSkills[cat].splice(idx, 1)[0];
+        renderSkillsEditList();
+        showNotification(`Removed ${removed.name} from skills draft.`, 'info');
+    }
+};
+
+window.editSkillLocal = (cat, idx) => {
+    if (tempSkills[cat] && tempSkills[cat][idx]) {
+        const skill = tempSkills[cat][idx];
+        document.getElementById('newSkillName').value = skill.name || '';
+        document.getElementById('newSkillLevel').value = skill.level || '';
+        document.getElementById('newSkillCategory').value = cat || '';
+        
+        // Remove from list so it can be re-added after editing
+        tempSkills[cat].splice(idx, 1);
+        renderSkillsEditList();
+        showNotification(`Editing ${skill.name}. Make your changes and click 'Add Skill'.`, 'info');
+    }
+};
+
+// ===== PROJECTS FORM =====
+function renderProjectsEditForm() {
+    const container = document.getElementById('dynamicEditFormContainer');
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="admin-sub-section">
+            <h4 class="admin-sub-section-title">Add New Project</h4>
+            <div class="form-row-admin">
+                <div class="form-group-admin">
+                    <label for="newProjTitle">Project Title:</label>
+                    <input type="text" id="newProjTitle" class="admin-input" placeholder="e.g. HM-BGRemover">
+                </div>
+                <div class="form-group-admin">
+                    <label for="newProjCategory">Category:</label>
+                    <select id="newProjCategory" class="admin-input">
+                        <option value="websec">Web Security (websec)</option>
+                        <option value="webapp">Web Application (webapp)</option>
+                        <option value="security">Security Infrastructure (security)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group-admin">
+                <label for="newProjDesc">Description:</label>
+                <textarea id="newProjDesc" class="admin-input" rows="3" placeholder="Describe the project goal and design..."></textarea>
+            </div>
+            <div class="form-row-admin">
+                <div class="form-group-admin">
+                    <label for="newProjTech">Technologies (comma separated):</label>
+                    <input type="text" id="newProjTech" class="admin-input" placeholder="HTML, CSS, Flask, APIs">
+                </div>
+                <div class="form-group-admin">
+                    <label for="newProjDate">Date/Period:</label>
+                    <input type="text" id="newProjDate" class="admin-input" placeholder="e.g. Jul - Aug 2025">
+                </div>
+            </div>
+            <div class="form-row-admin">
+                <div class="form-group-admin">
+                    <label for="newProjFindings">Findings / Learnings:</label>
+                    <textarea id="newProjFindings" class="admin-input" rows="2" placeholder=" learnings, security controls implemented..."></textarea>
+                </div>
+                <div class="form-group-admin">
+                    <label for="newProjLink">Project URL Link:</label>
+                    <input type="text" id="newProjLink" class="admin-input" placeholder="e.g. https://github.com/maheshgarlapally/HM-BGRemover">
+                </div>
+            </div>
+            <div class="admin-checkbox-group">
+                <input type="checkbox" id="newProjLive">
+                <label for="newProjLive">Include Live Demo link indicator</label>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="addProjectLocal()">
+                <i class="fas fa-plus"></i> Add Project to Draft
+            </button>
+        </div>
+
+        <h4 style="font-family: var(--font-heading); font-size: 0.9rem; color: var(--text-primary); margin-bottom: 0.5rem; text-transform: uppercase;">Current Projects Draft</h4>
+        <div id="adminProjectsListContainer" class="admin-list-container"></div>
+
+        <button class="btn btn-primary" onclick="proposeProjectsChanges()">
+            <i class="fas fa-paper-plane"></i> Propose Projects Changes
+        </button>
+    `;
+
+    renderProjectsEditList();
+}
+
+function renderProjectsEditList() {
+    const listContainer = document.getElementById('adminProjectsListContainer');
+    if (!listContainer) return;
+
+    if (!tempProjects || tempProjects.length === 0) {
+        listContainer.innerHTML = '<div class="empty-state">No projects in draft.</div>';
+        return;
+    }
+
+    listContainer.innerHTML = tempProjects.map((proj, idx) => `
+        <div class="admin-list-item">
+            <div class="admin-list-item-info">
+                <span class="admin-list-item-title">${escapeHtml(proj.title)}</span>
+                <span class="admin-list-item-subtitle">${proj.date} | Category: ${proj.category}</span>
+            </div>
+            <div class="admin-list-item-actions">
+                <button class="btn btn-sm btn-primary" onclick="editProjectLocal(${idx})" title="Edit">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-danger" onclick="removeProjectLocal(${idx})" title="Delete">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+window.addProjectLocal = () => {
+    const titleInput = document.getElementById('newProjTitle');
+    const catInput = document.getElementById('newProjCategory');
+    const descInput = document.getElementById('newProjDesc');
+    const techInput = document.getElementById('newProjTech');
+    const dateInput = document.getElementById('newProjDate');
+    const findingsInput = document.getElementById('newProjFindings');
+    const linkInput = document.getElementById('newProjLink');
+    const liveInput = document.getElementById('newProjLive');
+
+    if (!titleInput || !descInput) return;
+
+    const title = titleInput.value.trim();
+    const category = catInput.value;
+    const description = descInput.value.trim();
+    const technologies = techInput.value.split(',').map(t => t.trim()).filter(Boolean);
+    const date = dateInput.value.trim() || '2025';
+    const findings = findingsInput.value.trim();
+    const link = linkInput ? linkInput.value.trim() : '';
+    const liveDemo = liveInput.checked;
+
+    if (!title || !description) {
+        showNotification('Please enter a project title and description.', 'warning');
+        return;
+    }
+
+    const newId = tempProjects.length > 0 ? Math.max(...tempProjects.map(p => p.id)) + 1 : 1;
+
+    tempProjects.push({
+        id: newId,
+        title,
+        category,
+        description,
+        technologies,
+        date,
+        findings,
+        link,
+        liveDemo
+    });
+
+    // Reset inputs
+    titleInput.value = '';
+    descInput.value = '';
+    techInput.value = '';
+    dateInput.value = '';
+    findingsInput.value = '';
+    if (linkInput) linkInput.value = '';
+    liveInput.checked = false;
+
+    renderProjectsEditList();
+    showNotification(`Added project "${title}" to draft list.`, 'info');
+};
+
+window.removeProjectLocal = (idx) => {
+    if (tempProjects && tempProjects[idx]) {
+        const removed = tempProjects.splice(idx, 1)[0];
+        renderProjectsEditList();
+        showNotification(`Removed project "${removed.title}" from draft.`, 'info');
+    }
+};
+
+window.editProjectLocal = (idx) => {
+    if (tempProjects && tempProjects[idx]) {
+        const proj = tempProjects[idx];
+        document.getElementById('newProjTitle').value = proj.title || '';
+        document.getElementById('newProjCategory').value = proj.category || 'websec';
+        document.getElementById('newProjDesc').value = proj.description || '';
+        document.getElementById('newProjTech').value = (proj.technologies || []).join(', ');
+        document.getElementById('newProjDate').value = proj.date || '';
+        document.getElementById('newProjFindings').value = proj.findings || '';
+        if (document.getElementById('newProjLink')) document.getElementById('newProjLink').value = proj.link || '';
+        if (document.getElementById('newProjLive')) document.getElementById('newProjLive').checked = proj.liveDemo || false;
+        
+        // Remove from list so it can be re-added after editing
+        tempProjects.splice(idx, 1);
+        renderProjectsEditList();
+        showNotification(`Editing project "${proj.title}". Make changes and click 'Add Project'.`, 'info');
+    }
+};
+
+// ===== CERTIFICATIONS FORM =====
+function renderCertificationsEditForm() {
+    const container = document.getElementById('dynamicEditFormContainer');
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="admin-sub-section">
+            <h4 class="admin-sub-section-title">Add New Certification</h4>
+            <div class="form-row-admin">
+                <div class="form-group-admin">
+                    <label for="newCertTitle">Certification Title:</label>
+                    <input type="text" id="newCertTitle" class="admin-input" placeholder="e.g. CompTIA Security+">
+                </div>
+                <div class="form-group-admin">
+                    <label for="newCertIssuer">Issuer:</label>
+                    <input type="text" id="newCertIssuer" class="admin-input" placeholder="e.g. CompTIA">
+                </div>
+            </div>
+            <div class="form-row-admin">
+                <div class="form-group-admin">
+                    <label for="newCertDate">Completion Date:</label>
+                    <input type="text" id="newCertDate" class="admin-input" placeholder="e.g. 2025">
+                </div>
+                <div class="form-group-admin">
+                    <label for="newCertIcon">Icon Class (FontAwesome):</label>
+                    <input type="text" id="newCertIcon" class="admin-input" value="fas fa-certificate" placeholder="e.g. fas fa-user-secret">
+                </div>
+            </div>
+            <div class="form-group-admin">
+                <label for="newCertDesc">Short Description:</label>
+                <textarea id="newCertDesc" class="admin-input" rows="2" placeholder="Brief details about the certification syllabus or highlights..."></textarea>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="addCertLocal()">
+                <i class="fas fa-plus"></i> Add Certification to Draft
+            </button>
+        </div>
+
+        <h4 style="font-family: var(--font-heading); font-size: 0.9rem; color: var(--text-primary); margin-bottom: 0.5rem; text-transform: uppercase;">Current Certifications Draft</h4>
+        <div id="adminCertsListContainer" class="admin-list-container"></div>
+
+        <button class="btn btn-primary" onclick="proposeCertificationsChanges()">
+            <i class="fas fa-paper-plane"></i> Propose Certifications Changes
+        </button>
+    `;
+
+    renderCertificationsEditList();
+}
+
+function renderCertificationsEditList() {
+    const listContainer = document.getElementById('adminCertsListContainer');
+    if (!listContainer) return;
+
+    if (!tempCertifications || tempCertifications.length === 0) {
+        listContainer.innerHTML = '<div class="empty-state">No certifications in draft.</div>';
+        return;
+    }
+
+    listContainer.innerHTML = tempCertifications.map((cert, idx) => `
+        <div class="admin-list-item">
+            <div class="admin-list-item-info">
+                <span class="admin-list-item-title">${escapeHtml(cert.title)}</span>
+                <span class="admin-list-item-subtitle">${cert.issuer} (${cert.date})</span>
+            </div>
+            <div class="admin-list-item-actions">
+                <button class="btn btn-sm btn-primary" onclick="editCertLocal(${idx})" title="Edit">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-danger" onclick="removeCertLocal(${idx})" title="Delete">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+window.addCertLocal = () => {
+    const titleInput = document.getElementById('newCertTitle');
+    const issuerInput = document.getElementById('newCertIssuer');
+    const dateInput = document.getElementById('newCertDate');
+    const iconInput = document.getElementById('newCertIcon');
+    const descInput = document.getElementById('newCertDesc');
+
+    if (!titleInput || !issuerInput) return;
+
+    const title = titleInput.value.trim();
+    const issuer = issuerInput.value.trim();
+    const date = dateInput.value.trim() || '2025';
+    const icon = iconInput.value.trim() || 'fas fa-certificate';
+    const description = descInput.value.trim();
+
+    if (!title || !issuer) {
+        showNotification('Please enter a certification title and issuer.', 'warning');
+        return;
+    }
+
+    const newId = tempCertifications.length > 0 ? Math.max(...tempCertifications.map(c => c.id)) + 1 : 1;
+
+    tempCertifications.push({
+        id: newId,
+        title,
+        issuer,
+        date,
+        icon,
+        description
+    });
+
+    // Reset inputs
+    titleInput.value = '';
+    issuerInput.value = '';
+    dateInput.value = '';
+    descInput.value = '';
+
+    renderCertificationsEditList();
+    showNotification(`Added certification "${title}" to draft.`, 'info');
+};
+
+window.removeCertLocal = (idx) => {
+    if (tempCertifications && tempCertifications[idx]) {
+        const removed = tempCertifications.splice(idx, 1)[0];
+        renderCertificationsEditList();
+        showNotification(`Removed certification "${removed.title}" from draft.`, 'info');
+    }
+};
+
+window.editCertLocal = (idx) => {
+    if (tempCertifications && tempCertifications[idx]) {
+        const cert = tempCertifications[idx];
+        document.getElementById('newCertTitle').value = cert.title || '';
+        document.getElementById('newCertIssuer').value = cert.issuer || '';
+        document.getElementById('newCertDate').value = cert.date || '';
+        document.getElementById('newCertIcon').value = cert.icon || 'fas fa-certificate';
+        document.getElementById('newCertDesc').value = cert.description || '';
+        
+        // Remove from list so it can be re-added after editing
+        tempCertifications.splice(idx, 1);
+        renderCertificationsEditList();
+        showNotification(`Editing certification "${cert.title}". Make changes and click 'Add Certification'.`, 'info');
+    }
+};
+
+
+// ===== DASHBOARD PROPOSAL SUBMISSIONS =====
+async function proposeAboutChanges() {
+    const title = document.getElementById('aboutTitleInput').value.trim();
+    const description = document.getElementById('aboutDescInput').value.trim();
+    
+    if (!title || !description) {
+        showNotification('Title and Description cannot be empty.', 'warning');
+        return;
+    }
+
+    const currentTitle = document.querySelector('.about-title') ? document.querySelector('.about-title').textContent.trim() : '';
+    const currentDesc = document.querySelector('.about-description') ? document.querySelector('.about-description').textContent.trim() : '';
+
+    const content = { title, description };
+    const oldContent = { title: currentTitle, description: currentDesc };
+
+    await submitProposal('about', 'Updated About Me details', content, oldContent, 'about');
+}
+
+async function proposeHeroChanges() {
+    const description = document.getElementById('heroDescInput').value.trim();
+    
+    if (!description) {
+        showNotification('Hero description cannot be empty.', 'warning');
+        return;
+    }
+
+    const heroDesc = document.querySelector('.hero-description');
+    const currentDesc = heroDesc ? heroDesc.textContent.trim() : '';
+
+    const content = { description };
+    const oldContent = { description: currentDesc };
+
+    await submitProposal('hero', 'Updated Hero Section details', content, oldContent, 'home');
+}
+
+async function proposeSkillsChanges() {
+    await submitProposal('skills', 'Updated technical skills list', tempSkills, skillsData, 'skills');
+}
+
+async function proposeProjectsChanges() {
+    await submitProposal('projects', 'Updated projects list', tempProjects, projectsData, 'projects');
+}
+
+async function proposeCertificationsChanges() {
+    await submitProposal('certifications', 'Updated certifications list', tempCertifications, certificationsData, 'certifications');
+}
+
+async function submitProposal(section, description, content, oldContent, elementId) {
+    try {
+        const response = await fetch('/api/portfolio/propose', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${adminToken}`
+            },
+            body: JSON.stringify({
+                type: 'edit',
+                section: section,
+                description: description,
+                content: content,
+                oldContent: oldContent,
+                elementId: elementId
+            })
+        });
+
+        const result = await response.json();
+        if (response.ok && result.success) {
+            showNotification('Content change proposed successfully! Check the Pending Approval tab to review.', 'success');
+            await loadAdminDashboardData();
+            
+            // Switch to Pending Approval tab
+            const pendingTabBtn = document.querySelector('.admin-tabs button[data-tab="pending-changes-tab"]');
+            if (pendingTabBtn) pendingTabBtn.click();
+        } else {
+            showNotification(`Propose failed: ${result.error || 'Server error'}`, 'error');
+        }
+    } catch (error) {
+        showNotification(`Network error: ${error.message}`, 'error');
+    }
+}
+
+async function loadAdminDashboardData() {
+    if (!adminToken) return;
+    
+    try {
+        // 1. Fetch pending changes
+        const changesRes = await fetch('/api/portfolio/changes', {
+            headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        const changes = await changesRes.json();
+        const pendingChanges = changes.filter(c => c.status === 'pending');
+        
+        // Update badge
+        const changesBadge = document.getElementById('pendingChangesBadge');
+        if (changesBadge) changesBadge.textContent = pendingChanges.length;
+        
+        // Render pending changes
+        const pendingList = document.getElementById('pendingChangesList');
+        if (pendingList) {
+            if (pendingChanges.length === 0) {
+                pendingList.innerHTML = '<div class="empty-state">No pending changes to review.</div>';
+            } else {
+                pendingList.innerHTML = pendingChanges.map(change => {
+                    let proposedText = typeof change.content === 'object' ? JSON.stringify(change.content, null, 2) : change.content;
+                    let originalText = typeof change.oldContent === 'object' ? JSON.stringify(change.oldContent, null, 2) : change.oldContent;
+                    if (!originalText) originalText = '(Empty)';
+                    
+                    return `
+                        <div class="change-item">
+                            <div class="change-item-header">
+                                <span class="change-section-badge">${change.section}</span>
+                                <span class="change-time">${new Date(change.timestamp).toLocaleString()}</span>
+                            </div>
+                            <div class="change-desc">${change.description}</div>
+                            <div class="change-diff">
+                                <div>
+                                    <div style="font-size: 0.75rem; color: var(--danger); font-family: var(--font-mono); margin-bottom: 0.25rem;">CURRENT LIVE CONTENT:</div>
+                                    <div class="diff-box old">${escapeHtml(originalText)}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.75rem; color: var(--primary); font-family: var(--font-mono); margin-bottom: 0.25rem;">PROPOSED CONTENT:</div>
+                                    <div class="diff-box new">${escapeHtml(proposedText)}</div>
+                                </div>
+                            </div>
+                            <div class="change-actions">
+                                <button class="btn btn-sm btn-danger" onclick="rejectChange('${change.id}')">
+                                    <i class="fas fa-times"></i> Reject
+                                </button>
+                                <button class="btn btn-sm btn-success" onclick="approveChange('${change.id}')">
+                                    <i class="fas fa-check"></i> Approve & Apply
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+        
+        // 2. Fetch contact messages
+        const msgsRes = await fetch('/api/messages', {
+            headers: { 'Authorization': `Bearer ${adminToken}` }
+        });
+        const messages = await msgsRes.json();
+        const unreadCount = messages.filter(m => m.status === 'unread').length;
+        
+        // Update badge
+        const msgsBadge = document.getElementById('visitorMessagesBadge');
+        if (msgsBadge) msgsBadge.textContent = unreadCount;
+        
+        // Render contact messages
+        const messagesList = document.getElementById('visitorMessagesList');
+        if (messagesList) {
+            if (messages.length === 0) {
+                messagesList.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="empty-state">No messages received yet.</td>
+                    </tr>
+                `;
+            } else {
+                const sortedMsgs = [...messages].sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+                messagesList.innerHTML = sortedMsgs.map(msg => `
+                    <tr class="${msg.status}">
+                        <td class="change-time">${new Date(msg.timestamp).toLocaleDateString()}<br>${new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td>
+                        <td>
+                            <strong>${escapeHtml(msg.name)}</strong><br>
+                            <span style="color: var(--text-muted); font-size: 0.8rem;">${escapeHtml(msg.email)}</span>
+                            ${msg.company ? `<br><span style="font-size: 0.8rem; font-style: italic;">${escapeHtml(msg.company)}</span>` : ''}
+                        </td>
+                        <td><span class="change-section-badge" style="border-color: var(--border); color: var(--text-secondary);">${escapeHtml(msg.inquiry)}</span></td>
+                        <td style="white-space: pre-wrap; max-width: 300px;">${escapeHtml(msg.message)}</td>
+                        <td>
+                            <div style="display: flex; gap: 0.25rem;">
+                                ${msg.status === 'unread' ? `
+                                    <button class="btn btn-sm btn-success" onclick="markMessageRead('${msg.id}')" title="Mark as Read">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                ` : ''}
+                                <button class="btn btn-sm btn-danger" onclick="deleteMessage('${msg.id}')" title="Delete Message">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        }
+    } catch (error) {
+        console.error('Error loading dashboard data:', error);
+    }
+}
+
+function escapeHtml(str) {
+    if (typeof str !== 'string') return str;
+    return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 // ===== Update Init Function =====
 function init() {
-    console.log('🚀 Cybersecurity Fresher Portfolio Initialized');
+    console.log('🚀 Cybersecurity Portfolio Initialized');
     
     // Initialize all systems
     addNotificationStyles();
@@ -2504,14 +3479,14 @@ function init() {
     initTheme();
     initNavigation();
     initTerminal();
-    initSkills();
-    initProjects();
-    initCertifications();
+    
+    // Load dynamic content from backend
+    loadPortfolioData();
+    
     initContactForm();
     initSmoothScrolling();
     initRootControls();
     initSecuritySystem();
-    initSaveSystem(); // Add save system
     setupCleanup();
 }
 // ===== Simplified Security Functions =====
@@ -2564,46 +3539,10 @@ function initSecuritySystem() {
         }
     });
     
-    // Create readonly indicator
-    const readonlyIndicator = document.createElement('div');
-    readonlyIndicator.className = 'readonly-indicator';
-    readonlyIndicator.innerHTML = `
-        <i class="fas fa-eye"></i>
-        <span>Read-Only Mode</span>
-        <span class="access-tag access-user">USER</span>
-    `;
-    document.body.appendChild(readonlyIndicator);
-    
-    // Update indicator on root mode change
-    const updateAccessIndicator = () => {
-        if (isRootMode) {
-            readonlyIndicator.innerHTML = `
-                <i class="fas fa-edit"></i>
-                <span>Read-Write Mode</span>
-                <span class="access-tag access-root">ROOT</span>
-            `;
-        } else {
-            readonlyIndicator.innerHTML = `
-                <i class="fas fa-eye"></i>
-                <span>Read-Only Mode</span>
-                <span class="access-tag access-user">USER</span>
-            `;
-        }
-    };
-    
-    // Override activate/deactivate functions
-    const originalActivate = activateRootMode;
-    const originalDeactivate = deactivateRootMode;
-    
-    activateRootMode = function() {
-        originalActivate();
-        updateAccessIndicator();
-    };
-    
-    deactivateRootMode = function() {
-        originalDeactivate();
-        updateAccessIndicator();
-    };
+    // Auto-restore root mode session if token exists
+    if (adminToken) {
+        activateRootMode();
+    }
     
     console.log('🔐 Security system initialized (simplified)');
 }
@@ -2618,15 +3557,15 @@ const simplifiedUserCommands = {
             return `
 Available Commands (User Mode):
 • help          - Show this help message
-• about         - Display fresher profile
+• about         - Display professional profile
 • education     - Show academic background
 • skills        - Show technical skills
 • projects      - List security projects
 • experience    - Show internship learning
 • certifications - List certifications
 • contact       - Show contact information
-• hireme        - Why hire this fresher
-• fresher       - Fresher availability and goals
+• hireme        - Why hire me
+• status        - Availability and career goals
 • clear         - Clear terminal
 • theme         - Toggle dark/light theme
 • matrix        - Toggle matrix background
@@ -2653,13 +3592,31 @@ Type "su [password]" to switch to root user.
     
     su: {
         description: 'Switch to root user',
-        execute: (args) => {
+        execute: async (args) => {
             if (args.length > 0) {
-                if (args[0] === rootPassword) {
-                    activateRootMode();
-                    return '✅ Root access granted.\nType "help" for root commands.';
-                } else {
-                    return '❌ Access denied. Incorrect password.';
+                let password = args[0];
+                if ((password.startsWith('[') && password.endsWith(']')) ||
+                    (password.startsWith('"') && password.endsWith('"')) ||
+                    (password.startsWith("'") && password.endsWith("'"))) {
+                    password = password.slice(1, -1);
+                }
+                try {
+                    const response = await fetch('/api/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ password: password })
+                    });
+                    const data = await response.json();
+                    if (response.ok && data.success) {
+                        sessionStorage.setItem('adminToken', data.token);
+                        adminToken = data.token;
+                        activateRootMode();
+                        return '✅ Root access granted.\nType "help" for root commands.';
+                    } else {
+                        return `❌ Access denied. ${data.error || 'Incorrect password.'}`;
+                    }
+                } catch (error) {
+                    return `❌ Authentication error: ${error.message}`;
                 }
             } else {
                 return 'Usage: su [password]\nRoot access required for modifications.';
@@ -2671,7 +3628,58 @@ Type "su [password]" to switch to root user.
 // Replace user commands
 Object.assign(userCommands, simplifiedUserCommands);
 
-// ===== Remove old modal initialization =====
-// Remove these lines from the original code:
-// - initSecuritySystem() function (we have a new one above)
-// - Any references to security-modal or hint-modal
+// Resume Upload Logic
+document.addEventListener('DOMContentLoaded', () => {
+    const uploadBtn = document.getElementById('uploadResumeBtn');
+    const uploadInput = document.getElementById('resumeUploadInput');
+    const uploadStatus = document.getElementById('resumeUploadStatus');
+
+    if (uploadBtn && uploadInput && uploadStatus) {
+        uploadBtn.addEventListener('click', async () => {
+            const file = uploadInput.files[0];
+            if (!file) {
+                uploadStatus.innerHTML = '<span style="color: #ff4c4c;">Please select a PDF file first.</span>';
+                return;
+            }
+            if (file.type !== 'application/pdf') {
+                uploadStatus.innerHTML = '<span style="color: #ff4c4c;">Only PDF files are allowed.</span>';
+                return;
+            }
+
+            // 'adminToken' might be defined globally, but check sessionStorage as fallback
+            const token = sessionStorage.getItem('adminToken') || (typeof adminToken !== 'undefined' ? adminToken : null);
+            if (!token) {
+                uploadStatus.innerHTML = '<span style="color: #ff4c4c;">Not authenticated. Root access required.</span>';
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('resume', file);
+
+            uploadStatus.innerHTML = '<span style="color: #00d2ff;">Uploading...</span>';
+            uploadBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/admin/resume', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+                if (response.ok && data.success) {
+                    uploadStatus.innerHTML = '<span style="color: #00ff00;">Resume uploaded successfully!</span>';
+                    uploadInput.value = '';
+                } else {
+                    uploadStatus.innerHTML = `<span style="color: #ff4c4c;">Upload failed: ${data.error || 'Unknown error'}</span>`;
+                }
+            } catch (error) {
+                uploadStatus.innerHTML = `<span style="color: #ff4c4c;">Upload error: ${error.message}</span>`;
+            } finally {
+                uploadBtn.disabled = false;
+            }
+        });
+    }
+});

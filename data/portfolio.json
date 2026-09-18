@@ -1,0 +1,177 @@
+{
+  "about": "As a BCA graduate with strong academic performance (90% aggregate) and CEH certification, I have built a solid foundation in cybersecurity. I am focused on utilizing my expertise in security operations, threat detection, and digital forensics to secure critical environments.Mahesh Garlapally is a Certified Ethical Hacker and cybersecurity analyst with a strong track record of securing systems.",
+  "hero": {
+    "description": "I’m Mahesh, an aspiring Python Developer and Cybersecurity Professional passionate about developing intelligent applications, securing digital systems, and creating modern web experiences. I love solving complex problems, learning emerging technologies, and transforming innovative ideas into impactful solutions."
+  },
+  "skills": {
+    "tools": [
+      {
+        "name": "Nmap",
+        "level": 85
+      },
+      {
+        "name": "Burp Suite",
+        "level": 80
+      },
+      {
+        "name": "Metasploit",
+        "level": 75
+      },
+      {
+        "name": "OWASP ZAP",
+        "level": 70
+      }
+    ],
+    "programming": [
+      {
+        "name": "Python",
+        "level": 70
+      },
+      {
+        "name": "JavaScript",
+        "level": 75
+      },
+      {
+        "name": "HTML/CSS",
+        "level": 85
+      },
+      {
+        "name": "MySQL",
+        "level": 70
+      },
+      {
+        "name": "C",
+        "level": 80
+      }
+    ],
+    "cyber": [
+      {
+        "name": "Ethical Hacking",
+        "level": 80
+      },
+      {
+        "name": "Vulnerability Assessment",
+        "level": 75
+      },
+      {
+        "name": "Web App Security",
+        "level": 80
+      },
+      {
+        "name": "Network Security",
+        "level": 70
+      }
+    ],
+    "platforms": [
+      {
+        "name": "TryHackMe",
+        "level": 85
+      },
+      {
+        "name": "Hack The Box",
+        "level": 70
+      },
+      {
+        "name": "OWASP Top 10",
+        "level": 80
+      },
+      {
+        "name": "Security Fundamentals",
+        "level": 85
+      }
+    ]
+  },
+  "projects": [
+    {
+      "id": 1,
+      "title": "HM-BGRemover – Secure Web Application",
+      "category": "websec",
+      "description": "Implemented secure API integration with emphasis on input validation and error handling",
+      "technologies": [
+        "HTML",
+        "CSS",
+        "JavaScript",
+        "Flask",
+        "REST APIs"
+      ],
+      "date": "May - Jul 2025",
+      "findings": "Learned secure coding practices and vulnerability prevention",
+      "liveDemo": true
+    },
+    {
+      "id": 2,
+      "title": "TeacherX – AI Learning Platform",
+      "category": "websec",
+      "description": "Applied secure UI practices and client-side validation techniques",
+      "technologies": [
+        "HTML",
+        "CSS",
+        "JavaScript",
+        "Tailwind CSS"
+      ],
+      "date": "Jul - Aug 2025",
+      "findings": "Gained exposure to authentication flows and frontend security",
+      "liveDemo": true
+    },
+    {
+      "id": 3,
+      "title": "YT-Downloader – Web Tool",
+      "category": "webapp",
+      "description": "Improved controlled input handling and application stability",
+      "technologies": [
+        "Flask",
+        "JavaScript",
+        "yt-dlp"
+      ],
+      "date": "Aug - Sep 2025",
+      "findings": "Optimized error handling to minimize misuse scenarios",
+      "liveDemo": true
+    }
+  ],
+  "certifications": [
+    {
+      "id": 1,
+      "title": "Certified Ethical Hacker (CEH)",
+      "issuer": "Training Completed",
+      "date": "2024",
+      "icon": "fas fa-user-secret",
+      "description": "Ethical hacking and penetration testing fundamentals"
+    },
+    {
+      "id": 2,
+      "title": "Cybersecurity Analyst Job Simulation",
+      "issuer": "Forage",
+      "date": "2024",
+      "icon": "fas fa-chart-line",
+      "description": "Practical cybersecurity analyst simulation"
+    },
+    {
+      "id": 3,
+      "title": "Cyber Job Simulation",
+      "issuer": "Deloitte",
+      "date": "2024",
+      "icon": "fas fa-building",
+      "description": "Industry-focused cyber simulation experience"
+    }
+  ],
+  "experience": {
+    "title": "Cybersecurity Intern",
+    "company": "Uptoskills - Online Internship",
+    "period": "May 2025 - Aug 2025",
+    "description": "Gained practical experience in cybersecurity fundamentals during this online internship, applying theoretical knowledge to real-world scenarios.",
+    "responsibilities": [
+      "Conducted vulnerability scanning using Nmap and Burp Suite",
+      "Learned penetration testing methodologies with Metasploit",
+      "Applied OWASP Top 10 guidelines for web application security assessment",
+      "Practiced network traffic analysis and basic threat detection",
+      "Assisted in creating risk assessment documentation"
+    ],
+    "tools": [
+      "Nmap",
+      "Burp Suite",
+      "Metasploit",
+      "OWASP ZAP",
+      "Kali Linux"
+    ]
+  }
+}

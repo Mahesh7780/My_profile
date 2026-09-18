@@ -1,32 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mahesh Garlapally | Cybersecurity Fresher - Seeking Entry-Level Roles</title>
-    <meta name="description" content="Cybersecurity Fresher | CEH Certified | BCA Graduate | Seeking Entry-Level SOC, VAPT, Security Analyst Positions">
+    <title>Mahesh Garlapally | Cybersecurity Specialist & Analyst</title>
+    <meta name="description"
+        content="Cybersecurity Specialist | CEH Certified | BCA Graduate | Specializing in Security Operations, VAPT, and Penetration Testing">
     <meta name="author" content="Mahesh Garlapally">
-    
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Source+Code+Pro:wght@300;400;500&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Source+Code+Pro:wght@300;400;500&display=swap"
+        rel="stylesheet">
+
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    
+
     <!-- Styles -->
     <link rel="stylesheet" href="style.css">
-    
+
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 </head>
+
 <body>
     <!-- Terminal Loader -->
     <div class="terminal-loader" id="terminalLoader">
         <div class="terminal-header">
-            <div class="terminal-title">bash - Fresher Portfolio Initialization</div>
+            <div class="terminal-title">bash - Portfolio Initialization</div>
             <div class="terminal-controls">
                 <div class="control close"></div>
                 <div class="control minimize"></div>
@@ -34,199 +39,56 @@
             </div>
         </div>
         <div class="terminal-body">
-            <div class="terminal-line">$ initializing_fresher_portfolio.sh</div>
+            <div class="terminal-line">$ initializing_portfolio.sh</div>
             <div class="terminal-line">$ loading_cybersecurity_skills...</div>
-            <div class="terminal-line">$ checking_job_availability...</div>
-            <div class="terminal-line">$ preparing_for_entry_level_roles...</div>
+            <div class="terminal-line">$ checking_availability...</div>
+            <div class="terminal-line">$ preparing_security_environment...</div>
             <div class="terminal-line" id="loaderLine">$ █</div>
         </div>
     </div>
 
     <!-- Add this after the terminal window section -->
-<!-- Security Warning Modal -->
-<div class="security-modal" id="securityModal">
-    <div class="security-modal-content">
-        <div class="security-header">
-            <i class="fas fa-shield-alt"></i>
-            <h3>Access Restricted</h3>
-        </div>
-        <div class="security-body">
-            <p>This action requires <strong>root access</strong>.</p>
-            <p>To modify portfolio details, you must have elevated privileges.</p>
-            <div class="security-command">
-                <code>su [password]</code>
-                <span>Switch to root user</span>
+    <!-- Security Warning Modal -->
+    <div class="security-modal" id="securityModal">
+        <div class="security-modal-content">
+            <div class="security-header">
+                <i class="fas fa-shield-alt"></i>
+                <h3>Access Restricted</h3>
             </div>
-        </div>
-        <div class="security-footer">
-            <button class="btn btn-primary" id="closeSecurityModal">
-                <i class="fas fa-lock"></i> Close
-            </button>
-            <button class="btn btn-outline" onclick="showPasswordHint()">
-                <i class="fas fa-key"></i> Get Password Hint
-            </button>
-        </div>
-    </div>
-</div>
-<!-- Add this after the root controls panel -->
-<!-- Save Options Modal -->
-<div class="save-modal" id="saveModal">
-    <div class="save-modal-content">
-        <div class="save-header">
-            <i class="fas fa-save"></i>
-            <h3>Save Changes</h3>
-        </div>
-        <div class="save-body">
-            <p>Choose how to save your modifications:</p>
-            
-            <div class="save-options">
-                <div class="save-option" data-type="permanent">
-                    <div class="option-header">
-                        <i class="fas fa-database"></i>
-                        <h4>Permanent Save</h4>
-                        <span class="save-badge">Recommended</span>
-                    </div>
-                    <div class="option-features">
-                        <p><i class="fas fa-check"></i> Saved in browser storage</p>
-                        <p><i class="fas fa-check"></i> Persists after browser restart</p>
-                        <p><i class="fas fa-check"></i> Available across sessions</p>
-                        <p><i class="fas fa-check"></i> Can be backed up/exported</p>
-                    </div>
-                    <div class="option-storage">
-                        <span>Storage: LocalStorage</span>
-                        <span>Duration: Until cleared</span>
-                    </div>
-                </div>
-                
-                <div class="save-option" data-type="temporary">
-                    <div class="option-header">
-                        <i class="fas fa-clock"></i>
-                        <h4>Temporary Save</h4>
-                        <span class="save-badge save-badge-temp">Session Only</span>
-                    </div>
-                    <div class="option-features">
-                        <p><i class="fas fa-check"></i> Saved in session storage</p>
-                        <p><i class="fas fa-times"></i> Lost on browser close</p>
-                        <p><i class="fas fa-check"></i> Available in current session</p>
-                        <p><i class="fas fa-times"></i> Cannot be backed up</p>
-                    </div>
-                    <div class="option-storage">
-                        <span>Storage: SessionStorage</span>
-                        <span>Duration: Current session</span>
-                    </div>
-                </div>
-                
-                <div class="save-option" data-type="none">
-                    <div class="option-header">
-                        <i class="fas fa-ban"></i>
-                        <h4>Don't Save</h4>
-                        <span class="save-badge save-badge-none">Preview Mode</span>
-                    </div>
-                    <div class="option-features">
-                        <p><i class="fas fa-times"></i> Changes not saved</p>
-                        <p><i class="fas fa-check"></i> Live preview only</p>
-                        <p><i class="fas fa-times"></i> Lost on page refresh</p>
-                        <p><i class="fas fa-check"></i> Good for testing</p>
-                    </div>
-                    <div class="option-storage">
-                        <span>Storage: Memory Only</span>
-                        <span>Duration: Until refresh</span>
-                    </div>
+            <div class="security-body">
+                <p>This action requires <strong>root access</strong>.</p>
+                <p>To modify portfolio details, you must have elevated privileges.</p>
+                <div class="security-command">
+                    <code>su [password]</code>
+                    <span>Switch to root user</span>
                 </div>
             </div>
-            
-            <div class="save-info">
-                <i class="fas fa-info-circle"></i>
-                <p>Current save mode: <span id="currentSaveMode">Loading...</span></p>
-                <p class="save-info-detail" id="saveModeDetail"></p>
+            <div class="security-footer">
+                <button class="btn btn-primary" id="closeSecurityModal">
+                    <i class="fas fa-lock"></i> Close
+                </button>
+                <button class="btn btn-outline" onclick="showPasswordHint()">
+                    <i class="fas fa-key"></i> Get Password Hint
+                </button>
             </div>
         </div>
-        <div class="save-footer">
-            <button class="btn btn-outline" id="cancelSave">
-                <i class="fas fa-times"></i> Cancel
-            </button>
-            <button class="btn btn-primary" id="confirmSave">
-                <i class="fas fa-check"></i> Apply Save Mode
-            </button>
-            <button class="btn btn-secondary" id="exportChanges">
-                <i class="fas fa-download"></i> Export Changes
-            </button>
+    </div>
+    <!-- Add this after the root controls panel -->
+
+    <!-- Access Denied Notification -->
+    <div class="access-denied-notification" id="accessDeniedNotification">
+        <div class="denied-content">
+            <i class="fas fa-ban"></i>
+            <h3>ACCESS DENIED</h3>
+            <p>Root access required for this action</p>
+            <div class="denied-hint">
+                <span>Use: <code>su [password]</code></span>
+            </div>
         </div>
     </div>
-</div>
-
-<!-- Auto-save Indicator -->
-<div class="autosave-indicator" id="autosaveIndicator">
-    <i class="fas fa-sync-alt fa-spin"></i>
-    <span>Auto-saving...</span>
-</div>
-
-<!-- Save Status Bar -->
-<div class="save-status-bar" id="saveStatusBar">
-    <div class="save-status-content">
-        <span class="save-status-icon">
-            <i class="fas fa-save"></i>
-        </span>
-        <span class="save-status-text">
-            <strong>Save Status:</strong>
-            <span id="saveStatusText">Ready</span>
-        </span>
-        <span class="save-status-mode">
-            <span class="mode-tag" id="modeTag">Permanent</span>
-        </span>
-        <span class="save-status-actions">
-            <button class="btn-save-small" id="quickSave">
-                <i class="fas fa-save"></i> Quick Save
-            </button>
-            <button class="btn-save-small" id="changeSaveMode">
-                <i class="fas fa-cog"></i> Mode
-            </button>
-        </span>
-    </div>
-</div>
-
-<!-- Access Denied Notification -->
-<div class="access-denied-notification" id="accessDeniedNotification">
-    <div class="denied-content">
-        <i class="fas fa-ban"></i>
-        <h3>ACCESS DENIED</h3>
-        <p>Root access required for this action</p>
-        <div class="denied-hint">
-            <span>Use: <code>su [password]</code></span>
-        </div>
-    </div>
-</div>
 
 
-<!-- Auto-save Indicator -->
-<div class="autosave-indicator" id="autosaveIndicator">
-    <i class="fas fa-sync-alt fa-spin"></i>
-    <span>Auto-saving...</span>
-</div>
 
-<!-- Save Status Bar -->
-<div class="save-status-bar" id="saveStatusBar">
-    <div class="save-status-content">
-        <span class="save-status-icon">
-            <i class="fas fa-save"></i>
-        </span>
-        <span class="save-status-text">
-            <strong>Save Status:</strong>
-            <span id="saveStatusText">Ready</span>
-        </span>
-        <span class="save-status-mode">
-            <span class="mode-tag" id="modeTag">Permanent</span>
-        </span>
-        <span class="save-status-actions">
-            <button class="btn-save-small" id="quickSave">
-                <i class="fas fa-save"></i> Quick Save
-            </button>
-            <button class="btn-save-small" id="changeSaveMode">
-                <i class="fas fa-cog"></i> Mode
-            </button>
-        </span>
-    </div>
-</div>
 
     <!-- Matrix Background -->
     <div class="matrix-bg" id="matrixBg"></div>
@@ -237,12 +99,12 @@
             <!-- <a href="#home" class="logo">
                 <div class="logo-icon">
                     <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-                        <rect width="40" height="40" rx="8" fill="#00ff88"/>
+                        <rect width="40" height="40" rx="8" fill="var(--primary)"/>
                         <path d="M10 20L20 10L30 20L20 30L10 20Z" fill="#0a0a0a"/>
-                        <path d="M15 15L25 25M25 15L15 25" stroke="#00ff88" stroke-width="2"/>
+                        <path d="M15 15L25 25M25 15L15 25" stroke="var(--primary)" stroke-width="2"/>
                     </svg>
                 </div> -->
-                <!-- <div class="logo-text">
+            <!-- <div class="logo-text">
                     <span class="logo-name">CYBER</span>
                     <span class="logo-surname">FRESHER</span>
                 </div> -->
@@ -251,13 +113,19 @@
             <div class="nav-right">
                 <ul class="nav-menu" id="navMenu">
                     <li><a href="#home" class="nav-link active"><i class="fas fa-home"></i> <span>HOME</span></a></li>
-                    <li><a href="#about" class="nav-link"><i class="fas fa-user-graduate"></i> <span>ABOUT</span></a></li>
-                    <li><a href="#education" class="nav-link"><i class="fas fa-graduation-cap"></i> <span>EDUCATION</span></a></li>
+                    <li><a href="#about" class="nav-link"><i class="fas fa-user-graduate"></i> <span>ABOUT ME</span></a>
+                    </li>
+                    <li><a href="#education" class="nav-link"><i class="fas fa-graduation-cap"></i>
+                            <span>QUALIFICATION</span></a></li>
                     <li><a href="#skills" class="nav-link"><i class="fas fa-terminal"></i> <span>SKILLS</span></a></li>
-                    <li><a href="#projects" class="nav-link"><i class="fas fa-laptop-code"></i> <span>PROJECTS</span></a></li>
-                    <li><a href="#experience" class="nav-link"><i class="fas fa-briefcase"></i> <span>EXPERIENCE</span></a></li>
-                    <li><a href="#certifications" class="nav-link"><i class="fas fa-certificate"></i> <span>CERTIFICATIONS</span></a></li>
-                    <li><a href="#contact" class="nav-link"><i class="fas fa-envelope"></i> <span>CONTACT</span></a></li>
+                    <li><a href="#projects" class="nav-link"><i class="fas fa-laptop-code"></i>
+                            <span>PROJECTS</span></a></li>
+                    <li><a href="#experience" class="nav-link"><i class="fas fa-briefcase"></i>
+                            <span>EXPERIENCE</span></a></li>
+                    <li><a href="#certifications" class="nav-link"><i class="fas fa-certificate"></i>
+                            <span>CERTIFICATIONS</span></a></li>
+                    <li><a href="#contact" class="nav-link"><i class="fas fa-envelope"></i> <span>CONTACT</span></a>
+                    </li>
                 </ul>
 
                 <div class="nav-actions">
@@ -282,7 +150,7 @@
     <!-- Terminal Window -->
     <div class="terminal-window" id="terminalWindow">
         <div class="terminal-header">
-            <div class="terminal-title">fresher@cyberportfolio:~</div>
+            <div class="terminal-title">mahesh@cyberportfolio:~</div>
             <div class="terminal-controls">
                 <button class="control close" id="terminalClose">
                     <i class="fas fa-times"></i>
@@ -292,40 +160,34 @@
         <div class="terminal-body" id="terminalBody">
             <div class="terminal-output">
                 <div class="terminal-line">Welcome to CyberPortfolio Terminal v1.0</div>
-                <div class="terminal-line">Cybersecurity Fresher - Open to Entry-Level Opportunities</div>
+                <div class="terminal-line">Cybersecurity Specialist - Securing Digital Assets</div>
                 <div class="terminal-line">Type 'help' for available commands</div>
                 <div class="terminal-line">-------------------------------------</div>
             </div>
             <div class="terminal-input-line">
-                <span class="prompt">fresher@cyberportfolio:~$</span>
+                <span class="prompt">mahesh@cyberportfolio:~$</span>
                 <input type="text" class="terminal-input" id="terminalInput" autocomplete="off" autofocus>
             </div>
         </div>
     </div>
 
     <!-- Hero Section -->
-<section id="home" class="hero-section">
-    <div class="container">
-        <div class="hero-grid">
+    <section id="home" class="hero-section">
+        <div class="container">
             <div class="hero-content">
-                <!-- <div class="hero-badge">
-                    <span class="badge-icon"><i class="fas fa-user-graduate"></i></span>
-                    <span class="badge-text">CYBERSECURITY FRESHER</span>
-                </div> -->
-                
                 <h1 class="hero-title">
-                    <span class="title-line">READY FOR</span>
-                    <span class="title-line">ENTRY-LEVEL</span>
-                    <span class="title-line">
-                        <span class="typing-text" id="typingText">CYBERSECURITY</span>
-                        <span class="cursor">|</span>
+                    <span class="title-line name-title">MAHESH GARLAPALLY</span>
+                    <span class="title-line role-title">
+                        SPECIALIZING IN <span class="typing-text" id="typingText">CYBERSECURITY</span><span
+                            class="cursor">|</span>
                     </span>
                 </h1>
-                
+
                 <p class="hero-description">
-                    I'm <strong class="glitch-text">Mahesh Garlapally</strong>, a recent BCA graduate with 90% aggregate and CEH certification, actively seeking my first cybersecurity role. Eager to apply my skills in SOC analysis, VAPT, and web application security.
+                    BCA graduate with 90% aggregate and Certified Ethical Hacker (CEH) certification. Specializing in
+                    SOC analysis, penetration testing, and vulnerability assessment.
                 </p>
-                
+
                 <!-- <div class="hero-stats">
                     <div class="stat-card">
                         <div class="stat-icon">
@@ -355,16 +217,16 @@
                         </div>
                     </div>
                 </div> -->
-                
+
                 <div class="hero-actions">
                     <a href="#contact" class="btn btn-primary">
-                        <i class="fas fa-handshake"></i> HIRE FRESHER
+                        <i class="fas fa-handshake"></i> HIRE ME
                     </a>
-                    <a href="#projects" class="btn btn-outline">
-                        <i class="fas fa-eye"></i> VIEW MY PROJECTS
+                    <a href="/assets/resume.pdf" target="_blank" class="btn btn-outline">
+                        <i class="fas fa-file-pdf"></i>RESUME
                     </a>
                 </div>
-                
+
                 <!-- <div class="hero-platforms">
                     <span class="platform-label">Target Roles:</span>
                     <div class="role-tags">
@@ -374,162 +236,51 @@
                     </div>
                 </div> -->
             </div>
-            
-            <div class="hero-visual">
-                <!-- Combined Photo and Globe Container -->
-                <div class="profile-globe-container">
-                    <!-- Profile Photo in Center of Globe -->
-                    <div class="profile-photo-wrapper">
-                        <!-- Replace with your photo
-                        <div class="profile-photo-placeholder">
-                            <i class="fas fa-user-circle"></i>
-                            <span>Your Photo Here</span>
-                        </div> -->
-                        <!-- If you have a photo, use this instead: -->
-                        <img src="assets/profile-photo.jpg" alt="Mahesh Garlapally" class="profile-photo">
-                    </div>
-                    
-                    <!-- Cyber Globe Animation -->
-                    <div class="cyber-globe">
-                        <div class="globe-inner">
-                            <div class="globe-grid"></div>
-                            <div class="globe-nodes">
-                                <div class="node"></div>
-                                <div class="node"></div>
-                                <div class="node"></div>
-                                <div class="node"></div>
-                                <div class="node"></div>
-                            </div>
-                            <div class="globe-connections">
-                                <!-- <div class="connection"></div>
-                                <div class="connection"></div>
-                                <div class="connection"></div> -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Photo Upload Instructions -->
-                <!-- <div class="photo-instructions">
-                    <p><i class="fas fa-info-circle"></i> Add your professional photo to assets folder as "profile-photo.jpg"</p>
-                </div> -->
-                
-                <div class="floating-elements">
-                    <div class="floating-card card-1">
-                        <i class="fas fa-user-graduate"></i>
-                        <span>BCA GRADUATE</span>
-                    </div>
-                    <div class="floating-card card-2">
-                        <i class="fas fa-code"></i>
-                        <span>SEEKING JOB</span>
-                    </div>
-                    <div class="floating-card card-3">
-                        <i class="fas fa-network-wired"></i>
-                        <span>ENTRY LEVEL</span>
-                    </div>
-                </div>
-            </div>
         </div>
-    </div>
-</section>
+    </section>
     <!-- About Section -->
-<!-- About Section -->
-<section id="about" class="about-section">
-    <div class="container">
-        <div class="section-header">
-            <h2 class="section-title">CYBERSECURITY <span class="highlight">FRESHER</span></h2>
-            <p class="section-subtitle">Recent graduate ready to start cybersecurity career</p>
-        </div>
-        
-        <div class="about-grid">
-            <!-- TERMINAL ON LEFT SIDE (FIRST) -->
-            <div class="about-terminal">
-                <div class="cyber-frame">
-                    <div class="frame-content">
-                        <div class="hacker-terminal">
-                            <div class="terminal-header">
-                                <span>fresher@job-search:~</span>
-                            </div>
-                            <div class="terminal-body">
-                                <div class="terminal-line" style="--line-index: 1">$ whoami</div>
-                                <div class="terminal-line" style="--line-index: 2">>> cybersecurity_fresher</div>
-                                <div class="terminal-line" style="--line-index: 3">$ cat profile.txt</div>
-                                <div class="terminal-line" style="--line-index: 4">>> BCA Graduate (90%)</div>
-                                <div class="terminal-line" style="--line-index: 5">>> CEH Certified</div>
-                                <div class="terminal-line" style="--line-index: 6">>> Seeking First Job</div>
-                                <div class="terminal-line" style="--line-index: 7">>> Ready to Learn</div>
-                                <div class="terminal-line blinking" style="--line-index: 8">$ _</div>
+    <!-- About Section -->
+    <section id="about" class="about-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">ABOUT <span class="highlight">ME</span></h2>
+            </div>
+
+            <div class="about-grid">
+                <!-- TERMINAL ON LEFT SIDE (FIRST) -->
+                <div class="about-terminal">
+                    <div class="cyber-frame">
+                        <div class="frame-content">
+                            <div class="hacker-terminal">
+                                <div class="terminal-header">
+                                    <span>mahesh@job-search:~</span>
+                                </div>
+                                <div class="terminal-body" style="min-height: 250px;">
+                                    <div class="terminal-line" style="--line-index: 1">$ whoami</div>
+                                    <div class="terminal-line" style="--line-index: 2">>> mahesh_garlapally</div>
+                                    <div class="terminal-line" style="--line-index: 3">$ cat about_me.txt</div>
+                                    <div class="terminal-line about-description"
+                                        style="--line-index: 4; white-space: pre-wrap; color: var(--text-secondary) !important;">
+                                        <!-- Loaded dynamically from backend -->
+                                    </div>
+                                    <div class="terminal-line blinking" style="--line-index: 5">$ _</div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <!-- CONTENT ON RIGHT SIDE (SECOND) -->
-            <div class="about-content">
-                <h3 class="about-title">EAGER TO START MY CYBERSECURITY JOURNEY</h3>
-                <p class="about-description">
-                    As a recent BCA graduate with strong academic performance (90% aggregate) and CEH certification, I have built a solid foundation in cybersecurity. I'm actively seeking my first professional role where I can contribute, learn from experienced teams, and grow into a valuable security professional.
-                </p>
-                
-                <div class="about-features">
-                    <div class="feature">
-                        <div class="feature-icon">
-                            <i class="fas fa-graduation-cap"></i>
-                        </div>
-                        <div class="feature-content">
-                            <h4>Strong Academic Foundation</h4>
-                            <p>BCA degree with 90% aggregate, demonstrating strong learning capability</p>
-                        </div>
-                    </div>
-                    <div class="feature">
-                        <div class="feature-icon">
-                            <i class="fas fa-certificate"></i>
-                        </div>
-                        <div class="feature-content">
-                            <h4>CEH Certified</h4>
-                            <p>Completed Certified Ethical Hacker training program</p>
-                        </div>
-                    </div>
-                    <div class="feature">
-                        <div class="feature-icon">
-                            <i class="fas fa-laptop-code"></i>
-                        </div>
-                        <div class="feature-content">
-                            <h4>Job Ready</h4>
-                            <p>Actively seeking entry-level cybersecurity positions</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Learning Progress -->
-                <div class="learning-progress">
-                    <div class="level-header">
-                        <span>READY FOR FIRST JOB</span>
-                        <span class="level-value">90%</span>
-                    </div>
-                    <div class="level-bar">
-                        <div class="level-progress"></div>
-                    </div>
-                    <div class="progress-labels">
-                        <span>Learning</span>
-                        <span>Job Ready</span>
-                    </div>
-                </div>
-            </div>
         </div>
-    </div>
-</section>
+    </section>
 
     <!-- Education Section -->
     <section id="education" class="education-section">
         <div class="container">
             <div class="section-header">
                 <!-- <span class="section-label"><i class="fas fa-graduation-cap"></i> ACADEMIC BACKGROUND</span> -->
-                <h2 class="section-title">EDUCATIONAL <span class="highlight">QUALIFICATIONS</span></h2>
-                <p class="section-subtitle">Strong academic foundation ready for professional application</p>
+                <h2 class="section-title"><span class="highlight">QUALIFICATION</span></h2>
             </div>
-            
+
             <div class="education-timeline">
                 <div class="timeline-item">
                     <div class="timeline-year">2023 - 2026</div>
@@ -537,10 +288,12 @@
                         <h3> Bachelor of Computer Applications (BCA)</h3>
                         <p class="institution">Chaitanya Deemed To Be University, Hyderabad</p>
                         <p class="grade">Aggregate: 90%</p>
-                        <p class="description">Completed degree with excellent academic performance, focusing on cybersecurity fundamentals, programming, and software development. Ready to apply knowledge in professional setting.</p>
+                        <p class="description">Completed degree with excellent academic performance, focusing on
+                            cybersecurity fundamentals, programming, and software development. Ready to apply knowledge
+                            in professional setting.</p>
                     </div>
                 </div>
-                
+
                 <div class="timeline-item">
                     <div class="timeline-year">2021 - 2023</div>
                     <div class="timeline-content">
@@ -559,40 +312,35 @@
         <div class="container">
             <div class="section-header">
                 <!-- <span class="section-label"><i class="fas fa-terminal"></i> TECHNICAL SKILLS</span> -->
-                <h2 class="section-title">CYBERSECURITY <span class="highlight">COMPETENCIES</span></h2>
-                <p class="section-subtitle">Skills developed for entry-level cybersecurity roles</p>
+                <h2 class="section-title">TECHNICAL <span class="highlight">SKILLS</span></h2>
             </div>
-            
+
             <div class="skills-container">
-                <div class="skills-left">
-                    <div class="skill-category">
-                        <h3><i class="fas fa-tools"></i> Security Tools</h3>
-                        <div class="skill-items" id="toolsSkills">
-                            <!-- Loaded via JavaScript -->
-                        </div>
-                    </div>
-                    
-                    <div class="skill-category">
-                        <h3><i class="fas fa-code"></i> Programming</h3>
-                        <div class="skill-items" id="programmingSkills">
-                            <!-- Loaded via JavaScript -->
-                        </div>
+                <div class="skill-category">
+                    <h3><i class="fas fa-tools"></i> Security Tools</h3>
+                    <div class="skill-items" id="toolsSkills">
+                        <!-- Loaded via JavaScript -->
                     </div>
                 </div>
-                
-                <div class="skills-right">
-                    <div class="skill-category">
-                        <h3><i class="fas fa-shield-alt"></i> Cybersecurity Areas</h3>
-                        <div class="skill-items" id="cyberSkills">
-                            <!-- Loaded via JavaScript -->
-                        </div>
+
+                <div class="skill-category">
+                    <h3><i class="fas fa-code"></i> Programming</h3>
+                    <div class="skill-items" id="programmingSkills">
+                        <!-- Loaded via JavaScript -->
                     </div>
-                    
-                    <div class="skill-category">
-                        <h3><i class="fas fa-laptop"></i> Platforms & Knowledge</h3>
-                        <div class="skill-items" id="platformSkills">
-                            <!-- Loaded via JavaScript -->
-                        </div>
+                </div>
+
+                <div class="skill-category">
+                    <h3><i class="fas fa-shield-alt"></i> Cybersecurity Areas</h3>
+                    <div class="skill-items" id="cyberSkills">
+                        <!-- Loaded via JavaScript -->
+                    </div>
+                </div>
+
+                <div class="skill-category">
+                    <h3><i class="fas fa-laptop"></i> Platforms & Knowledge</h3>
+                    <div class="skill-items" id="platformSkills">
+                        <!-- Loaded via JavaScript -->
                     </div>
                 </div>
             </div>
@@ -604,10 +352,9 @@
         <div class="container">
             <div class="section-header">
                 <!-- <span class="section-label"><i class="fas fa-laptop-code"></i> SECURITY PROJECTS</span> -->
-                <h2 class="section-title">HANDS-ON <span class="highlight">LEARNING</span></h2>
-                <p class="section-subtitle">Practical projects demonstrating cybersecurity understanding</p>
+                <h2 class="section-title"><span class="highlight">PROJECTS</span></h2>
             </div>
-            
+
             <div class="projects-grid" id="projectsGrid">
                 <!-- Loaded via JavaScript -->
             </div>
@@ -619,10 +366,9 @@
         <div class="container">
             <div class="section-header">
                 <!-- <span class="section-label"><i class="fas fa-briefcase"></i> INTERNSHIP LEARNING</span> -->
-                <h2 class="section-title">PRACTICAL <span class="highlight">EXPERIENCE</span></h2>
-                <p class="section-subtitle">Hands-on learning during cybersecurity internship</p>
+                <h2 class="section-title"><span class="highlight">EXPERIENCE</span></h2>
             </div>
-            
+
             <div class="experience-card">
                 <div class="experience-header">
                     <div class="experience-title">
@@ -633,10 +379,11 @@
                         <span class="period">May 2025 - Aug 2025</span>
                     </div>
                 </div>
-                
+
                 <div class="experience-content">
-                    <p>Gained practical experience in cybersecurity fundamentals during this online internship, applying theoretical knowledge to real-world scenarios.</p>
-                    
+                    <p>Gained practical experience in cybersecurity fundamentals during this online internship, applying
+                        theoretical knowledge to real-world scenarios.</p>
+
                     <div class="experience-responsibilities">
                         <h4>Key Learning Areas:</h4>
                         <ul>
@@ -647,7 +394,7 @@
                             <li>Assisted in creating risk assessment documentation</li>
                         </ul>
                     </div>
-                    
+
                     <div class="experience-tools">
                         <h4>Tools Used:</h4>
                         <div class="tool-tags">
@@ -668,10 +415,9 @@
         <div class="container">
             <div class="section-header">
                 <!-- <span class="section-label"><i class="fas fa-certificate"></i> CERTIFICATIONS</span> -->
-                <h2 class="section-title">PROFESSIONAL <span class="highlight">CERTIFICATIONS</span></h2>
-                <p class="section-subtitle">Industry-relevant cybersecurity certifications and training</p>
+                <h2 class="section-title"><span class="highlight">CERTIFICATIONS</span></h2>
             </div>
-            
+
             <div class="certifications-grid" id="certificationsGrid">
                 <!-- Loaded via JavaScript -->
             </div>
@@ -683,20 +429,41 @@
         <div class="container">
             <div class="section-header">
                 <!-- <span class="section-label"><i class="fas fa-envelope"></i> CONTACT</span> -->
-                <h2 class="section-title">AVAILABLE FOR <span class="highlight">OPPORTUNITIES</span></h2>
-                <p class="section-subtitle">Seeking entry-level cybersecurity roles | Ready to join immediately</p>
+                <h2 class="section-title"><span class="highlight">CONTACT</span></h2>
             </div>
-            
+
             <div class="contact-grid">
                 <div class="contact-info">
-                    <div class="availability-notice">
-                        <i class="fas fa-bullhorn"></i>
-                        <div>
-                            <h4>Currently Available</h4>
-                            <p>Actively seeking entry-level cybersecurity positions</p>
+                    <div class="contact-card">
+                        <div class="contact-icon">
+                            <i class="fas fa-share-alt"></i>
+                        </div>
+                        <div class="contact-details" style="width: 100%;">
+                            <h3>Social Profiles</h3>
+                            <div class="social-links-grid" style="margin-top: 1rem;">
+                                <a href="https://linkedin.com/in/maheshgarlapally" target="_blank"
+                                    class="social-link-item">
+                                    <i class="fab fa-linkedin"></i>
+                                    <span>LinkedIn</span>
+                                </a>
+                                <a href="https://github.com/maheshgarlapally" target="_blank" class="social-link-item">
+                                    <i class="fab fa-github"></i>
+                                    <span>GitHub</span>
+                                </a>
+                                <a href="https://leetcode.com/maheshgarlapally" target="_blank"
+                                    class="social-link-item">
+                                    <i class="fas fa-code"></i>
+                                    <span>LeetCode</span>
+                                </a>
+                                <a href="https://tryhackme.com/p/maheshgarlapally" target="_blank"
+                                    class="social-link-item">
+                                    <i class="fas fa-shield-alt"></i>
+                                    <span>TryHackMe</span>
+                                </a>
+                            </div>
                         </div>
                     </div>
-                    
+
                     <div class="contact-card">
                         <div class="contact-icon">
                             <i class="fas fa-envelope"></i>
@@ -704,73 +471,40 @@
                         <div class="contact-details">
                             <h3>Email</h3>
                             <p>mahesh7780376316@gmail.com</p>
-                            <a href="mailto:mahesh7780376316@gmail.com?subject=Cybersecurity Opportunity&body=Hi Mahesh,%0D%0A%0D%0AI came across your portfolio and would like to discuss..." class="contact-link">
+                            <a href="mailto:mahesh7780376316@gmail.com?subject=Cybersecurity Opportunity&body=Hi Mahesh,%0D%0A%0D%0AI came across your portfolio and would like to discuss..."
+                                class="contact-link">
                                 <i class="fas fa-paper-plane"></i> Send Opportunity
                             </a>
                         </div>
                     </div>
-                    
-                    <div class="contact-card">
-                        <div class="contact-icon">
-                            <i class="fas fa-phone"></i>
-                        </div>
-                        <div class="contact-details">
-                            <h3>Phone</h3>
-                            <p>+91 7780376316</p>
-                            <a href="tel:+917780376316" class="contact-link">
-                                <i class="fas fa-phone-alt"></i> Call for Interview
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <div class="contact-card">
-                        <div class="contact-icon">
-                            <i class="fas fa-map-marker-alt"></i>
-                        </div>
-                        <div class="contact-details">
-                            <h3>Location & Availability</h3>
-                            <p>Hyderabad, Telangana</p>
-                            <p class="availability"></p>
-                        </div>
-                    </div>
                 </div>
-                
+
                 <div class="contact-form-container">
                     <form id="contactForm" class="contact-form">
                         <div class="form-group">
                             <input type="text" id="name" placeholder="Your Name" required>
                             <label for="name"><i class="fas fa-user"></i> Name </label>
                         </div>
-                        
+
                         <div class="form-group">
                             <input type="text" id="company" placeholder="Company/Organization">
                             <label for="company"><i class="fas fa-building"></i> Company (Optional)</label>
                         </div>
-                        
+
                         <div class="form-group">
                             <input type="email" id="email" placeholder="Your Email" required>
                             <label for="email"><i class="fas fa-envelope"></i> Email</label>
                         </div>
-                        
+
+
                         <div class="form-group">
-                            <select id="inquiry" required>
-                                <option value="">Select Inquiry Type</option>
-                                <option value="entry-level">Entry-level Position</option>
-                                <option value="internship">Internship Opportunity</option>
-                                <option value="interview">Interview Invitation</option>
-                                <option value="freelance">Project Discussion</option>
-                                <option value="other">Other Opportunity</option>
-                            </select>
-                            <label for="inquiry"><i class="fas fa-briefcase"></i> Opportunity Type</label>
-                        </div>
-                        
-                        <div class="form-group">
-                            <textarea id="message" rows="5" placeholder="Describe the role, requirements, and next steps..." required></textarea>
+                            <textarea id="message" rows="5"
+                                placeholder="Describe the role, requirements, and next steps..." required></textarea>
                             <label for="message"><i class="fas fa-comment"></i> Opportunity Details</label>
                         </div>
-                        
+
                         <button type="submit" class="btn btn-primary btn-submit">
-                            <i class="fas fa-paper-plane"></i> Send Opportunity Details
+                            <i class="fas fa-paper-plane"></i> Send
                         </button>
                     </form>
                 </div>
@@ -781,63 +515,95 @@
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <div class="footer-content">
-                <div class="footer-logo">
-                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-                        <rect width="40" height="40" rx="8" fill="#00ff88"/>
-                        <path d="M10 20L20 10L30 20L20 30L10 20Z" fill="#0a0a0a"/>
-                        <path d="M15 15L25 25M25 15L15 25" stroke="#00ff88" stroke-width="2"/>
-                    </svg>
-                    <div class="footer-brand">
-                        <h3>MAHESH GARLAPALLY</h3>
-                        <p>Cybersecurity Fresher | CEH Certified | BCA Graduate | Seeking Entry-Level Roles</p>
-                    </div>
-                </div>
-                
-                <div class="footer-links">
-                    <div class="footer-column">
-                        <h4>Quick Links</h4>
-                        <ul>
-                            <li><a href="#home">Home</a></li>
-                            <li><a href="#about">About</a></li>
-                            <li><a href="#skills">Skills</a></li>
-                            <li><a href="#projects">Projects</a></li>
-                        </ul>
-                    </div>
-                    
-                    <div class="footer-column">
-                        <h4>Target Roles</h4>
-                        <ul>
-                            <li><a href="#skills">SOC Analyst</a></li>
-                            <li><a href="#projects">VAPT Engineer</a></li>
-                            <li><a href="#experience">Security Analyst</a></li>
-                            <li><a href="#certifications">Entry-Level Security</a></li>
-                        </ul>
-                    </div>
-                    
-                    <div class="footer-column">
-                        <h4>Contact</h4>
-                        <ul>
-                            <li><a href="mailto:mahesh7780376316@gmail.com">Email</a></li>
-                            <li><a href="tel:+917780376316">Phone</a></li>
-                            <li><a href="#contact">Opportunities</a></li>
-                            <li><a href="#about">View Profile</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            
             <div class="footer-bottom">
                 <p>&copy; 2026 HackMe</p>
-                <div class="job-seeking-badge">
-                    <i class="fas fa-search"></i>
-                    <span>Actively Seeking Opportunities</span>
-                </div>
             </div>
         </div>
     </footer>
 
+    <!-- Root Controls Admin Panel Modal -->
+    <div class="security-modal" id="adminPanelModal">
+        <div class="security-modal-content admin-dashboard">
+            <div class="security-header">
+                <i class="fas fa-sliders-h"></i>
+                <h3>Root Administrator Dashboard</h3>
+                <button class="modal-close-btn" id="closeAdminPanelBtn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="admin-tabs">
+                <button class="tab-btn active" data-tab="edit-content-tab"><i class="fas fa-edit"></i> Edit
+                    Content</button>
+                <button class="tab-btn" data-tab="pending-changes-tab">
+                    <i class="fas fa-clipboard-check"></i> Pending Approval
+                    <span class="badge" id="pendingChangesBadge">0</span>
+                </button>
+                <button class="tab-btn" data-tab="visitor-messages-tab">
+                    <i class="fas fa-envelope"></i> Messages
+                    <span class="badge" id="visitorMessagesBadge">0</span>
+                </button>
+            </div>
+
+            <div class="admin-tab-content">
+                <!-- Edit Content Tab -->
+                <div class="tab-pane active" id="edit-content-tab">
+                    <div class="form-group-admin">
+                        <label for="editSectionSelect">Select Section to Edit:</label>
+                        <select id="editSectionSelect" class="admin-input">
+                            <option value="about">About Me</option>
+                            <option value="hero">Hero Section</option>
+                            <option value="skills">Technical Skills</option>
+                            <option value="projects">Projects List</option>
+                            <option value="certifications">Certifications List</option>
+                        </select>
+                    </div>
+                    <div class="form-group-admin"
+                        style="margin-top: 20px; border-top: 1px solid #333; padding-top: 15px;">
+                        <label>Upload New Resume (PDF):</label>
+                        <input type="file" id="resumeUploadInput" class="admin-input" accept="application/pdf">
+                        <button id="uploadResumeBtn" class="btn btn-primary"
+                            style="margin-top: 10px; width: 100%;">Upload Resume</button>
+                        <div id="resumeUploadStatus" style="margin-top: 10px; font-size: 0.9rem;"></div>
+                    </div>
+                    <div id="dynamicEditFormContainer"></div>
+                </div>
+
+                <!-- Pending Changes Tab -->
+                <div class="tab-pane" id="pending-changes-tab">
+                    <div class="changes-list-container">
+                        <div id="pendingChangesList" class="changes-list">
+                            <div class="empty-state">No pending changes to review.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visitor Messages Tab -->
+                <div class="tab-pane" id="visitor-messages-tab">
+                    <div class="messages-list-container">
+                        <div class="table-responsive">
+                            <table class="messages-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Sender</th>
+                                        <th>Inquiry</th>
+                                        <th>Message</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="visitorMessagesList">
+                                    <tr>
+                                        <td colspan="5" class="empty-state">No messages received yet.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
-    <script src="script.js"></script>
+    <script src="script.js?v=1.1"></script>
 </body>
+
 </html>
